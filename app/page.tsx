@@ -152,6 +152,7 @@ export default function Home() {
   const silenceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const speechBufferRef = useRef("");
   const hydratedRef = useRef(false);
+  const startListeningRef = useRef<(side: Side) => void>(function () {});
 
   const leftLanguage = useMemo(
     function () { return LANGUAGES.find(function (language) { return language.locale === leftLocale; }) || LANGUAGES[0]; },
@@ -305,7 +306,9 @@ export default function Home() {
       vibrate(35);
       speak(translatedText, to.locale, function () {
         if (autoHandoff) {
-          setStatus("Ready for " + (speaker === "left" ? "Speaker B" : "Speaker A"));
+          const nextSide: Side = speaker === "left" ? "right" : "left";
+          setStatus("Handing off to " + (nextSide === "left" ? "Speaker A" : "Speaker B") + "…");
+          window.setTimeout(function () { startListeningRef.current(nextSide); }, 350);
         }
       });
     } catch (error) {
@@ -401,6 +404,8 @@ export default function Home() {
       setActiveSide(null);
     }
   }, [busySide, leftLanguage.locale, rightLanguage.locale, stopListening, tone, translateText, vibrate]);
+
+  startListeningRef.current = startListening;
 
   function swapLanguages() {
     stopListening();
