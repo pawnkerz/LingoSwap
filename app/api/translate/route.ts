@@ -1,29 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const MAX_TEXT_LENGTH = 1800;
+const MAX_BODY_LENGTH = 8192;
 const LANGUAGE_CODE = /^[a-z]{2,3}(-[A-Z]{2})?$/;
 
 export async function POST(request: NextRequest) {
+  const contentLength = Number(request.headers.get("content-length") || 0);
+  if (contentLength > MAX_BODY_LENGTH) {
+    return NextResponse.json({ error: "Translation request is too large." }, { status: 413, headers: { "Cache-Control": "no-store" } });
+  }
+
   try {
-    const body = await request.json();
+    const rawBody = await request.text();
+    if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_LENGTH) {
+      return NextResponse.json({ error: "Translation request is too large." }, { status: 413, headers: { "Cache-Control": "no-store" } });
+    }
+
+    let body: Record<string, unknown>;
+    try {
+      const parsed: unknown = JSON.parse(rawBody);
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+        return NextResponse.json({ error: "Invalid translation request." }, { status: 400, headers: { "Cache-Control": "no-store" } });
+      }
+      body = parsed as Record<string, unknown>;
+    } catch {
+      return NextResponse.json({ error: "Invalid translation request." }, { status: 400, headers: { "Cache-Control": "no-store" } });
+    }
     const text = typeof body?.text === "string" ? body.text.trim() : "";
     const source = typeof body?.source === "string" ? body.source : "";
     const target = typeof body?.target === "string" ? body.target : "";
 
     if (!text) {
-      return NextResponse.json({ error: "Say or enter something to translate." }, { status: 400 });
+      return NextResponse.json({ error: "Say or enter something to translate." }, { status: 400, headers: { "Cache-Control": "no-store" } });
     }
 
     if (text.length > MAX_TEXT_LENGTH) {
-      return NextResponse.json({ error: "Translation is limited to 1,800 characters at a time." }, { status: 400 });
+      return NextResponse.json({ error: "Translation is limited to 1,800 characters at a time." }, { status: 400, headers: { "Cache-Control": "no-store" } });
     }
 
     if (!LANGUAGE_CODE.test(source) || !LANGUAGE_CODE.test(target)) {
-      return NextResponse.json({ error: "Unsupported language code." }, { status: 400 });
+      return NextResponse.json({ error: "Unsupported language code." }, { status: 400, headers: { "Cache-Control": "no-store" } });
     }
 
     if (source === target) {
-      return NextResponse.json({ translatedText: text, provider: "identity" });
+      return NextResponse.json({ translatedText: text, provider: "identity" }, { headers: { "Cache-Control": "no-store" } });
     }
 
     const sourceBase = source.split("-")[0];
@@ -35,35 +55,41 @@ export async function POST(request: NextRequest) {
     const controller = new AbortController();
     const timeout = setTimeout(function () { controller.abort(); }, 10000);
 
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: { "User-Agent": "LingoSwap/1.0" },
-      cache: "no-store"
-    });
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: { "User-Agent": "LingoSwap/1.0" },
+        cache: "no-store"
+      });
 
-    clearTimeout(timeout);
+      if (!response.ok) {
+        return NextResponse.json({ error: "Translation provider is temporarily unavailable." }, { status: 502, headers: { "Cache-Control": "no-store" } });
+      }
 
-    if (!response.ok) {
-      return NextResponse.json({ error: "Translation provider is temporarily unavailable." }, { status: 502 });
+      const data = await response.json();
+      const translated = data?.responseData?.translatedText;
+
+      if (data?.responseStatus !== 200 || typeof translated !== "string" || !translated.trim()) {
+        return NextResponse.json({ error: "No translation was returned. Try again shortly." }, { status: 502, headers: { "Cache-Control": "no-store" } });
+      }
+
+      return NextResponse.json({
+        translatedText: translated.trim(),
+        provider: "MyMemory"
+      }, { headers: { "Cache-Control": "no-store" } });
+    } finally {
+      clearTimeout(timeout);
     }
-
-    const data = await response.json();
-    const translated = data?.responseData?.translatedText;
-
-    if (typeof translated !== "string" || !translated.trim()) {
-      return NextResponse.json({ error: "No translation was returned." }, { status: 502 });
-    }
-
-    return NextResponse.json({
-      translatedText: translated.trim(),
-      provider: "MyMemory"
-    });
   } catch (error) {
-    const message =
-      error instanceof Error && error.name === "AbortError"
-        ? "Translation timed out. Try again."
+    const timedOut = error instanceof Error && error.name === "AbortError";
+    const providerFailure = error instanceof TypeError || error instanceof SyntaxError;
+    const message = timedOut
+      ? "Translation timed out. Try again."
+      : providerFailure
+        ? "Translation provider is temporarily unavailable."
         : "Translation failed. Try again.";
 
-    return NextResponse.json({ error: message }, { status: 500 });
+    const status = timedOut ? 504 : providerFailure ? 502 : 500;
+    return NextResponse.json({ error: message }, { status, headers: { "Cache-Control": "no-store" } });
   }
 }

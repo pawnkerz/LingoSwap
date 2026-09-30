@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type Side = "left" | "right";
 type Tab = "translate" | "chats" | "meetings" | "settings";
+type NameDialog = { kind: "chat" | "rename-chat" | "meeting"; chatId?: string; durationSec?: number };
 
 type Language = {
   label: string;
@@ -147,6 +148,8 @@ export default function Home() {
   const [meetingEntries, setMeetingEntries] = useState<Exchange[]>([]);
   const [elapsed, setElapsed] = useState(0);
   const [search, setSearch] = useState("");
+  const [nameDialog, setNameDialog] = useState<NameDialog | null>(null);
+  const [nameValue, setNameValue] = useState("");
 
   const recognitionRef = useRef<any>(null);
   const silenceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -421,17 +424,45 @@ export default function Home() {
       setStatus("There is no conversation to save yet.");
       return;
     }
-    const name = window.prompt("Name this conversation:", "Conversation " + new Date().toLocaleDateString());
-    if (!name?.trim()) return;
-    setSavedChats(function (items) {
-      return [{
-        id: id(),
-        name: name.trim(),
-        createdAt: new Date().toISOString(),
-        exchanges: history
-      }].concat(items);
-    });
-    setStatus("Conversation saved");
+    setNameValue("Conversation " + new Date().toLocaleDateString());
+    setNameDialog({ kind: "chat" });
+  }
+
+  function openRenameChat(chatId: string, currentName: string) {
+    setNameValue(currentName);
+    setNameDialog({ kind: "rename-chat", chatId });
+  }
+
+  function submitName() {
+    const name = nameValue.trim();
+    if (!name || !nameDialog) return;
+
+    if (nameDialog.kind === "chat") {
+      setSavedChats(function (items) {
+        return [{ id: id(), name, createdAt: new Date().toISOString(), exchanges: history }].concat(items);
+      });
+      setStatus("Conversation saved");
+    } else if (nameDialog.kind === "rename-chat" && nameDialog.chatId) {
+      setSavedChats(function (items) {
+        return items.map(function (item) { return item.id === nameDialog.chatId ? { ...item, name } : item; });
+      });
+      setStatus("Conversation renamed");
+    } else if (nameDialog.kind === "meeting") {
+      setSavedMeetings(function (items) {
+        return [{
+          id: id(),
+          name,
+          createdAt: new Date().toISOString(),
+          durationSec: nameDialog.durationSec || 1,
+          exchanges: meetingEntries
+        }].concat(items);
+      });
+      setMeetingStartedAt(null);
+      setMeetingEntries([]);
+      setStatus("Meeting saved");
+      setTab("meetings");
+    }
+    setNameDialog(null);
   }
 
   function clearCurrent() {
@@ -446,28 +477,19 @@ export default function Home() {
     setMeetingEntries([]);
     setMeetingStartedAt(Date.now());
     setElapsed(0);
-    setStatus("Meeting transcript recording started");
+    setStatus("Meeting transcript started");
     setTab("translate");
   }
 
   function finishMeeting() {
     if (!meetingStartedAt) return;
+    if (!meetingEntries.length) {
+      setStatus("No translated exchanges yet. Translate some speech before saving this meeting.");
+      return;
+    }
     const durationSec = Math.max(1, Math.floor((Date.now() - meetingStartedAt) / 1000));
-    const defaultName = "Meeting " + new Date().toLocaleString();
-    const name = window.prompt("Name this meeting:", defaultName) || defaultName;
-    setSavedMeetings(function (items) {
-      return [{
-        id: id(),
-        name,
-        createdAt: new Date().toISOString(),
-        durationSec,
-        exchanges: meetingEntries
-      }].concat(items);
-    });
-    setMeetingStartedAt(null);
-    setMeetingEntries([]);
-    setStatus("Meeting saved");
-    setTab("meetings");
+    setNameValue("Meeting " + new Date().toLocaleString());
+    setNameDialog({ kind: "meeting", durationSec });
   }
 
   const visibleChats = savedChats.filter(function (item) {
@@ -568,6 +590,32 @@ export default function Home() {
         </div>
       </header>
 
+      {nameDialog && (
+        <div className="dialog-backdrop">
+          <section className="name-dialog" role="dialog" aria-modal="true" aria-labelledby="name-dialog-title">
+            <h2 id="name-dialog-title">
+              {nameDialog.kind === "chat" ? "Save conversation" : nameDialog.kind === "rename-chat" ? "Rename conversation" : "Save meeting transcript"}
+            </h2>
+            <form onSubmit={function (event) { event.preventDefault(); submitName(); }}>
+              <label htmlFor="session-name">Name</label>
+              <input
+                id="session-name"
+                autoFocus
+                maxLength={80}
+                value={nameValue}
+                onChange={function (event) { setNameValue(event.target.value); }}
+              />
+              <div className="row-actions">
+                <button className="ghost-button" type="button" onClick={function () { setNameDialog(null); }}>Cancel</button>
+                <button className="primary-button" type="submit" disabled={!nameValue.trim()}>
+                  {nameDialog.kind === "rename-chat" ? "Save name" : "Save"}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
+
       <nav className="tabs" aria-label="LingoSwap sections">
         {(["translate", "chats", "meetings", "settings"] as Tab[]).map(function (item) {
           return (
@@ -587,7 +635,7 @@ export default function Home() {
         <div className="translate-view">
           <div className="status-bar">
             <span>{status}</span>
-            <span className="provider-note">Secure server translation · Browser voice</span>
+            <span className="provider-note">Text is sent to MyMemory for translation · Avoid sensitive content</span>
           </div>
 
           <div className="translator-grid">
@@ -668,13 +716,7 @@ export default function Home() {
                   </div>
                   <p className="preview-text">{chat.exchanges[0]?.translated || "Empty conversation"}</p>
                   <div className="row-actions">
-                    <button className="ghost-button" type="button" onClick={function () {
-                      const next = window.prompt("Rename conversation:", chat.name);
-                      if (!next?.trim()) return;
-                      setSavedChats(function (items) {
-                        return items.map(function (item) { return item.id === chat.id ? { ...item, name: next.trim() } : item; });
-                      });
-                    }}>Rename</button>
+                    <button className="ghost-button" type="button" onClick={function () { openRenameChat(chat.id, chat.name); }}>Rename</button>
                     <button className="ghost-button" type="button" onClick={function () {
                       downloadText(chat.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() + ".txt", transcript(chat.exchanges));
                     }}>Download</button>
