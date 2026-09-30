@@ -30,10 +30,10 @@ Open http://localhost:3000.
 
 ## Production notes
 
-The translation route currently uses the public MyMemory endpoint as a recovery fallback. For production scale, replace that provider behind `app/api/translate/route.ts` with a contracted translation service or AI provider, add rate limiting, and add privacy/retention controls appropriate to your use case.
+The translation route currently sends submitted text to the public MyMemory endpoint as a recovery fallback. Do not submit sensitive or regulated information. For production scale, replace that provider behind `app/api/translate/route.ts` with a contracted translation service or AI provider, add distributed rate limiting, and add privacy/retention controls appropriate to your use case.
 
 For speech recognition, Chromium-based browsers currently provide the strongest Web Speech API support. Typed translation continues to work when speech recognition is unavailable.
 
 ## Deployment
 
-This repo is ready for Vercel or another Next.js-compatible host. Do not point the LingoSwap deployment at an unrelated repository. Keep production secrets in host environment variables, never in this repository.
+This repo can be deployed to Vercel or another Next.js-compatible host. Authentication, cloud persistence, billing, and premium TTS remain unimplemented until their providers and authorization rules are configured. Do not point the LingoSwap deployment at an unrelated repository. Keep production secrets in host environment variables, never in this repository.
