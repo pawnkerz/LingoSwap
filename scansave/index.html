@@ -16,6 +16,29 @@
 @media(max-width:850px){.layout{grid-template-columns:1fr}.sidebar{position:static}.hero{padding-bottom:78px}.shell{margin-top:-43px}.top-actions .beta{display:none}}
 @media(max-width:560px){.market-grid{grid-template-columns:1fr}.top-inner{min-height:65px;padding:10px 14px}.brand{font-size:23px}.brand-icon{width:34px;height:34px;font-size:21px}.top-actions a{font-size:11px;padding:8px}.hero{padding:34px 17px 75px}.hero h1{font-size:46px}.hero p{font-size:14px}.shell{padding:0 11px}.card{padding:18px;border-radius:18px}.grid{grid-template-columns:1fr}.offer-list,.stores{grid-template-columns:1fr}.lead h2{font-size:20px}.cart-total{font-size:43px}.price-result .value{font-size:30px}.scanner video{height:280px}}
 
+.store-picker{padding:16px;border:1.5px solid #cde7a3;border-radius:16px;background:#f8fff1;margin:16px 0 19px}
+.store-picker-title{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+.store-picker-title strong{font-size:18px;font-weight:950}.store-picker-title .muted{margin:2px 0}
+.selected-count{background:#b8ff38;color:#17230c;border-radius:30px;padding:8px 11px;font-size:12px;font-weight:950;white-space:nowrap}
+.store-search-row{display:grid;grid-template-columns:1.3fr 1fr;gap:9px}.store-actions{display:flex;gap:8px;flex-wrap:wrap;margin:11px 0}
+.store-options{max-height:280px;overflow-y:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;border:1px solid #d8e8cf;border-radius:11px;background:#fff;padding:6px}
+.store-choice{display:flex;align-items:center;gap:8px;padding:9px;border:1px solid #e4eadf;border-radius:9px;cursor:pointer;min-width:0}
+.store-choice.checked{background:#efffd8;border-color:#a6d879}.store-choice input{accent-color:#4d8d1c;width:16px;height:16px;flex:none}
+.store-choice-info{display:grid;min-width:0;gap:1px}.store-choice-info b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.store-choice-info small{font-size:10px;color:#6d7a66;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.store-icon{width:32px;height:32px;flex:0 0 32px;border-radius:8px;background:white;border:1px solid #dce6d3;display:inline-flex;align-items:center;justify-content:center;color:#234f14;font-weight:900;font-size:14px;overflow:hidden}
+.store-icon img{width:24px;height:24px;object-fit:contain}.store-icon.mini{width:23px;height:23px;flex-basis:23px;border-radius:5px;font-size:11px}.store-icon.mini img{width:18px;height:18px}
+.selected-store-preview{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.store-preview-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid #c3e29c;background:#e8fcd4;border-radius:30px;padding:5px 9px;font-size:11px;font-weight:800}
+.market-groups{display:grid;gap:12px;margin-bottom:15px}
+.market-group{border:1px solid #dce8d3;border-radius:13px;padding:12px;background:#fff}
+.market-group-title{display:flex;gap:9px;align-items:center;margin-bottom:10px;font-weight:900;font-size:14px}
+.market-group-title small{font-size:11px;color:#687962;font-weight:600;margin-left:auto}
+.market-group .market-grid{margin:0}.store-result-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:300px;overflow-y:auto}
+.store-result-link{display:flex;align-items:center;gap:7px;padding:9px;border:1px solid #d4e6c4;background:#fbfff7;border-radius:10px;color:#2b6616;font-weight:800;font-size:12px;text-decoration:none}
+.store-result-link span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:560px){.store-options{grid-template-columns:1fr}.store-search-row,.store-result-links{grid-template-columns:1fr}}
+
 </style>
 </head>
 
@@ -34,8 +57,16 @@
  <section id="scanner" class="card">
   <div class="lead"><h2>Scan a product</h2><span class="step">STEP 01</span></div>
   <div class="mode"><button id="barcodeMode" type="button" class="active">▥ &nbsp; Standard barcode</button><button id="qrMode" type="button">▦ &nbsp; QR code</button></div>
-  <div class="grid"><div class="field"><label class="label" for="retailer">Shopping at</label><select id="retailer" class="input"><option value="target">Target</option><option value="walmart">Walmart</option><option value="costco">Costco</option><option value="walgreens">Walgreens</option><option value="cvs">CVS</option><option value="kroger">Kroger</option><option value="safeway">Safeway</option><option value="other">Another store</option></select></div>
-  <div class="field"><label class="label" for="code">Barcode or QR contents</label><input id="code" class="input" placeholder="Example: 3017620422003" autocomplete="off"></div></div>
+  <div class="field"><label class="label" for="code">Barcode or QR contents</label><input id="code" class="input" placeholder="Example: 3017620422003" autocomplete="off"></div>
+  <div class="store-picker" id="storePicker">
+    <div class="store-picker-title"><div><strong>Compare stores</strong><p class="muted">Optional — all 106 stores included by default.</p></div><span class="selected-count" id="storeCount">ALL 106</span></div>
+    <div class="store-search-row"><input id="storeSearch" class="input" type="search" placeholder="Search 106 stores…" autocomplete="off" aria-label="Search store names"><select id="storeCategory" class="input" aria-label="Filter store categories"><option value="">All categories</option></select></div>
+    <div class="store-actions"><button id="allStoresBtn" class="btn small" type="button">✓ All stores</button><button id="selectMatchesBtn" class="btn small outline" type="button">Select matches</button><button id="clearStoresBtn" class="btn small outline" type="button">Clear</button></div>
+    <p id="storeSelectionSummary" class="muted" role="status">All stores included wherever pricing data exists.</p>
+    <div id="selectedStorePreview" class="selected-store-preview"></div>
+    <div id="storeOptions" class="store-options" role="group" aria-label="Available stores"></div>
+    <p class="muted">Selecting stores filters results from available feeds; it does not grant live API coverage at all 106 retailers.</p>
+  </div>
   <div class="actions"><button class="btn" id="cameraBtn" type="button">▣ &nbsp; SCAN WITH CAMERA</button><button class="btn secondary" id="lookupBtn" type="button">SEARCH PRODUCT</button><button class="btn outline" id="exampleBtn" type="button">Try sample</button></div>
   <div id="scanStatus" class="notice" role="status" aria-live="polite">Choose a store and scan an item. Product identification is not guaranteed for every barcode.</div>
  </section>
@@ -44,7 +75,7 @@
   <div id="product" class="product"></div>
   <div class="subhead">Automatic price discovery</div>
   <div id="marketStatus" class="market-summary" aria-live="polite">Checking merchant listings and available reported prices…</div>
-  <div id="marketListings" class="market-grid"></div>
+  <div id="marketListings" class="market-groups"></div>
   <div class="market-note">Pricing sources may be limited, delayed, or unavailable. Merchant listings are not guaranteed in-store shelf prices. We never invent a discount.</div>
   <div class="field"><label class="label" for="productName">Product name (edit if needed)</label><input id="productName" class="input" placeholder="Enter a product name if lookup fails"></div>
   <div class="subhead">Enter your in-store price</div>
@@ -58,17 +89,18 @@
   <div class="price-result"><div><div class="desc">Estimated checkout total</div><div id="checkoutValue" class="value">$0.00</div></div><div><div class="desc">Potential savings + later rewards</div><div id="effectiveValue" class="value">$0.00</div></div><div class="footnote" id="calcNote">Enter a price and only discounts confirmed eligible for this product. Later rewards are not taken off today's bill.</div></div>
   <div class="actions"><button id="addCartBtn" class="btn" type="button">+ ADD TO MY SAVINGS BAG</button></div>
   <div id="addCartStatus" class="notice hidden" role="status"></div>
+  <div class="field"><label class="label" for="retailer">Store for checkout (optional)</label><select id="retailer" class="input"><option value="other">Not decided yet</option></select><p class="muted">Used only to organize checkout instructions. Your search can include multiple stores.</p></div>
   <div class="subhead">Deal finder</div>
   <div class="field"><label class="label" for="retailerProductURL">Retailer product page (optional, for verified code providers)</label><input type="url" id="retailerProductURL" class="input" placeholder="https://www.target.com/p/..." autocomplete="url"><p class="muted">Optional direct product link, never a login link. Verified coupon provider access is pending approval.</p></div>
   <div class="actions" style="margin-bottom:10px"><button class="btn outline" id="recheckCouponBtn" type="button">RECHECK COUPON FEEDS</button></div>
   <div class="chips"><span id="storeChip" class="chip">Store</span><span class="chip">Live search shortcuts</span><span class="chip">No invented coupon codes</span></div>
   <div id="couponStatus" class="coupon-status working hidden" role="status" aria-live="polite"><span id="couponStatusIcon" class="status-icon">🔎</span><div><strong id="couponStatusTitle">Checking offers</strong><p id="couponStatusMessage"></p></div></div>
   <div id="verifiedOffers" class="verified-offers"></div>
-  <div id="offerList" class="offer-list"></div>
+  <div id="offerList" class="offer-list"></div><div class="subhead">Explore selected retailers</div><div id="storeResultLinks" class="store-result-links"></div>
   <p class="muted">Search links are not verified coupons. Only enter discounts you confirmed work at the store. Automatic offer activation and price lookups require retailer or data-provider integrations.</p>
  </section>
  <section class="card" id="accounts"><div class="lead"><h2>Your stores & rewards</h2><span class="step">OPTIONAL</span></div>
-  <p class="muted">Open official store wallets to activate offers or show retailer-issued checkout codes. These shortcuts are not connected accounts and do not sync rewards.</p><div class="stores" id="storeList"></div>
+  <p class="muted">Saved store shortcuts with logos. These links open official retailer websites, not synchronized accounts.</p><div class="stores" id="storeList"></div>
  </section>
  <section class="card"><div class="lead"><h2>Recent scans</h2><span class="step">ON THIS PHONE</span></div><div class="recent" id="recent"></div><p class="muted">Scan history and your savings bag are stored in this browser, not in a ScanSave account.</p></section>
 </div>
@@ -241,7 +273,7 @@ function renderVerifiedOffers(offers){
 async function checkCoupons(name,barcode,token){
  $("verifiedOffers").replaceChildren();
  setCouponStatus("working","Checking product-specific coupon feeds…","Verified code providers are checked when connected; other routes appear below.");
- var params=new URLSearchParams({code:barcode,q:name||barcode,store:getStore().id});
+ var params=new URLSearchParams({code:barcode,q:name||barcode,store:currentStoreSelection===null||currentStoreSelection.length!==1?"all":currentStoreSelection[0]});
  var productURL=$("retailerProductURL").value.trim();
  if(productURL)params.set("product_url",productURL);
  try{
@@ -479,6 +511,169 @@ $("clearCartBtn").onclick=function(){if(!bag.length)return;if(!window.confirm("C
 $("checkoutBtn").onclick=function(){if(!bag.length){$("basket").scrollIntoView({behavior:"smooth"});return}
  $("checkoutPanel").classList.remove("hidden");$("checkoutPanel").scrollIntoView({behavior:"smooth",block:"start"})};
 renderBag();
+
+
+/* ScanSave store directory — source is a curated convenience directory, not a list of API partnerships. */
+var storesDirectory=[{"id":"walmart","name":"Walmart","domain":"walmart.com","category":"Big box"},{"id":"target","name":"Target","domain":"target.com","category":"Big box"},{"id":"costco","name":"Costco","domain":"costco.com","category":"Warehouse"},{"id":"samsclub","name":"Sam's Club","domain":"samsclub.com","category":"Warehouse"},{"id":"bjs","name":"BJ's Wholesale Club","domain":"bjs.com","category":"Warehouse"},{"id":"meijer","name":"Meijer","domain":"meijer.com","category":"Big box"},{"id":"fredmeyer","name":"Fred Meyer","domain":"fredmeyer.com","category":"Grocery"},{"id":"amazon","name":"Amazon","domain":"amazon.com","category":"Marketplace"},{"id":"ebay","name":"eBay","domain":"ebay.com","category":"Marketplace"},{"id":"etsy","name":"Etsy","domain":"etsy.com","category":"Marketplace"},{"id":"kroger","name":"Kroger","domain":"kroger.com","category":"Grocery"},{"id":"safeway","name":"Safeway","domain":"safeway.com","category":"Grocery"},{"id":"albertsons","name":"Albertsons","domain":"albertsons.com","category":"Grocery"},{"id":"publix","name":"Publix","domain":"publix.com","category":"Grocery"},{"id":"aldi","name":"Aldi","domain":"aldi.us","category":"Grocery"},{"id":"lidl","name":"Lidl","domain":"lidl.com","category":"Grocery"},{"id":"traderjoes","name":"Trader Joe's","domain":"traderjoes.com","category":"Grocery"},{"id":"wholefoodsmarket","name":"Whole Foods Market","domain":"wholefoodsmarket.com","category":"Grocery"},{"id":"sprouts","name":"Sprouts Farmers Market","domain":"sprouts.com","category":"Grocery"},{"id":"wincofoods","name":"WinCo Foods","domain":"wincofoods.com","category":"Grocery"},{"id":"heb","name":"H-E-B","domain":"heb.com","category":"Grocery"},{"id":"foodlion","name":"Food Lion","domain":"foodlion.com","category":"Grocery"},{"id":"giantfood","name":"Giant Food","domain":"giantfood.com","category":"Grocery"},{"id":"stopandshop","name":"Stop & Shop","domain":"stopandshop.com","category":"Grocery"},{"id":"shoprite","name":"ShopRite","domain":"shoprite.com","category":"Grocery"},{"id":"wegmans","name":"Wegmans","domain":"wegmans.com","category":"Grocery"},{"id":"harristeeter","name":"Harris Teeter","domain":"harristeeter.com","category":"Grocery"},{"id":"hy-vee","name":"Hy-Vee","domain":"hy-vee.com","category":"Grocery"},{"id":"gianteagle","name":"Giant Eagle","domain":"gianteagle.com","category":"Grocery"},{"id":"ralphs","name":"Ralphs","domain":"ralphs.com","category":"Grocery"},{"id":"vons","name":"Vons","domain":"vons.com","category":"Grocery"},{"id":"qfc","name":"QFC","domain":"qfc.com","category":"Grocery"},{"id":"frysfood","name":"Fry's Food Stores","domain":"frysfood.com","category":"Grocery"},{"id":"kingsoopers","name":"King Soopers","domain":"kingsoopers.com","category":"Grocery"},{"id":"smithsfoodanddrug","name":"Smith's Food & Drug","domain":"smithsfoodanddrug.com","category":"Grocery"},{"id":"dillons","name":"Dillons","domain":"dillons.com","category":"Grocery"},{"id":"groceryoutlet","name":"Grocery Outlet","domain":"groceryoutlet.com","category":"Grocery"},{"id":"savealot","name":"Save A Lot","domain":"savealot.com","category":"Grocery"},{"id":"weismarkets","name":"Weis Markets","domain":"weismarkets.com","category":"Grocery"},{"id":"hannaford","name":"Hannaford","domain":"hannaford.com","category":"Grocery"},{"id":"thefreshmarket","name":"The Fresh Market","domain":"thefreshmarket.com","category":"Grocery"},{"id":"staterbros","name":"Stater Bros.","domain":"staterbros.com","category":"Grocery"},{"id":"tomthumb","name":"Tom Thumb","domain":"tomthumb.com","category":"Grocery"},{"id":"randalls","name":"Randalls","domain":"randalls.com","category":"Grocery"},{"id":"marianos","name":"Mariano's","domain":"marianos.com","category":"Grocery"},{"id":"naturalgrocers","name":"Natural Grocers","domain":"naturalgrocers.com","category":"Grocery"},{"id":"foodcity","name":"Food City","domain":"foodcity.com","category":"Grocery"},{"id":"pigglywiggly","name":"Piggly Wiggly","domain":"pigglywiggly.com","category":"Grocery"},{"id":"walgreens","name":"Walgreens","domain":"walgreens.com","category":"Pharmacy & beauty"},{"id":"cvs","name":"CVS Pharmacy","domain":"cvs.com","category":"Pharmacy & beauty"},{"id":"ulta","name":"Ulta Beauty","domain":"ulta.com","category":"Pharmacy & beauty"},{"id":"sephora","name":"Sephora","domain":"sephora.com","category":"Pharmacy & beauty"},{"id":"sallybeauty","name":"Sally Beauty","domain":"sallybeauty.com","category":"Pharmacy & beauty"},{"id":"bathandbodyworks","name":"Bath & Body Works","domain":"bathandbodyworks.com","category":"Pharmacy & beauty"},{"id":"gnc","name":"GNC","domain":"gnc.com","category":"Pharmacy & beauty"},{"id":"vitaminshoppe","name":"The Vitamin Shoppe","domain":"vitaminshoppe.com","category":"Pharmacy & beauty"},{"id":"homedepot","name":"The Home Depot","domain":"homedepot.com","category":"Home & hardware"},{"id":"lowes","name":"Lowe's","domain":"lowes.com","category":"Home & hardware"},{"id":"acehardware","name":"Ace Hardware","domain":"acehardware.com","category":"Home & hardware"},{"id":"menards","name":"Menards","domain":"menards.com","category":"Home & hardware"},{"id":"harborfreight","name":"Harbor Freight","domain":"harborfreight.com","category":"Home & hardware"},{"id":"tractorsupply","name":"Tractor Supply","domain":"tractorsupply.com","category":"Home & hardware"},{"id":"northerntool","name":"Northern Tool","domain":"northerntool.com","category":"Home & hardware"},{"id":"homegoods","name":"HomeGoods","domain":"homegoods.com","category":"Home & hardware"},{"id":"athome","name":"At Home","domain":"athome.com","category":"Home & hardware"},{"id":"ikea","name":"IKEA","domain":"ikea.com","category":"Home & hardware"},{"id":"wayfair","name":"Wayfair","domain":"wayfair.com","category":"Home & hardware"},{"id":"potterybarn","name":"Pottery Barn","domain":"potterybarn.com","category":"Home & hardware"},{"id":"westelm","name":"West Elm","domain":"westelm.com","category":"Home & hardware"},{"id":"bestbuy","name":"Best Buy","domain":"bestbuy.com","category":"Electronics"},{"id":"apple","name":"Apple","domain":"apple.com","category":"Electronics"},{"id":"samsung","name":"Samsung","domain":"samsung.com","category":"Electronics"},{"id":"microcenter","name":"Micro Center","domain":"microcenter.com","category":"Electronics"},{"id":"gamestop","name":"GameStop","domain":"gamestop.com","category":"Electronics"},{"id":"newegg","name":"Newegg","domain":"newegg.com","category":"Electronics"},{"id":"bhphotovideo","name":"B&H Photo Video","domain":"bhphotovideo.com","category":"Electronics"},{"id":"staples","name":"Staples","domain":"staples.com","category":"Electronics"},{"id":"officedepot","name":"Office Depot","domain":"officedepot.com","category":"Electronics"},{"id":"dell","name":"Dell","domain":"dell.com","category":"Electronics"},{"id":"hp","name":"HP","domain":"hp.com","category":"Electronics"},{"id":"lenovo","name":"Lenovo","domain":"lenovo.com","category":"Electronics"},{"id":"microsoft","name":"Microsoft Store","domain":"microsoft.com","category":"Electronics"},{"id":"petco","name":"Petco","domain":"petco.com","category":"Pets"},{"id":"petsmart","name":"PetSmart","domain":"petsmart.com","category":"Pets"},{"id":"chewy","name":"Chewy","domain":"chewy.com","category":"Pets"},{"id":"petsuppliesplus","name":"Pet Supplies Plus","domain":"petsuppliesplus.com","category":"Pets"},{"id":"macys","name":"Macy's","domain":"macys.com","category":"Clothing"},{"id":"nordstrom","name":"Nordstrom","domain":"nordstrom.com","category":"Clothing"},{"id":"kohls","name":"Kohl's","domain":"kohls.com","category":"Clothing"},{"id":"jcpenney","name":"JCPenney","domain":"jcpenney.com","category":"Clothing"},{"id":"tjmaxx","name":"TJ Maxx","domain":"tjmaxx.tjx.com","category":"Clothing"},{"id":"marshalls","name":"Marshalls","domain":"marshalls.com","category":"Clothing"},{"id":"rossstores","name":"Ross Dress for Less","domain":"rossstores.com","category":"Clothing"},{"id":"burlington","name":"Burlington","domain":"burlington.com","category":"Clothing"},{"id":"oldnavy","name":"Old Navy","domain":"oldnavy.gap.com","category":"Clothing"},{"id":"gap","name":"Gap","domain":"gap.com","category":"Clothing"},{"id":"hm","name":"H&M","domain":"hm.com","category":"Clothing"},{"id":"nike","name":"Nike","domain":"nike.com","category":"Clothing"},{"id":"autozone","name":"AutoZone","domain":"autozone.com","category":"Auto"},{"id":"oreillyauto","name":"O'Reilly Auto Parts","domain":"oreillyauto.com","category":"Auto"},{"id":"advanceautoparts","name":"Advance Auto Parts","domain":"advanceautoparts.com","category":"Auto"},{"id":"napaonline","name":"NAPA Auto Parts","domain":"napaonline.com","category":"Auto"},{"id":"dollartree","name":"Dollar Tree","domain":"dollartree.com","category":"Discount"},{"id":"dollargeneral","name":"Dollar General","domain":"dollargeneral.com","category":"Discount"},{"id":"fivebelow","name":"Five Below","domain":"fivebelow.com","category":"Discount"},{"id":"daisous","name":"Daiso","domain":"daisous.com","category":"Discount"}];
+var preferredStoreIds=storesDirectory.map(function(s){return s.id});
+var currentStoreSelection=storeState("ss-selected-stores-v1",null);
+if(currentStoreSelection!==null){currentStoreSelection=Array.isArray(currentStoreSelection)?currentStoreSelection.filter(function(v){return preferredStoreIds.includes(v)}):null}
+var latestPriceData=null;
+function selectedRetailers(){return currentStoreSelection===null?storesDirectory:storesDirectory.filter(function(s){return currentStoreSelection.includes(s.id)})}
+function iconFor(store,small){
+ var wrapper=document.createElement("span");wrapper.className="store-icon"+(small?" mini":"");
+ var text=document.createElement("span");text.textContent=store.name.charAt(0).toUpperCase();wrapper.appendChild(text);
+ if(store.domain){
+  var logo=document.createElement("img");logo.alt="";logo.loading="lazy";logo.decoding="async";
+  logo.src="https://www.google.com/s2/favicons?domain="+encodeURIComponent(store.domain)+"&sz=64";
+  logo.onload=function(){if(logo.naturalWidth>=16){text.style.display="none"}else logo.remove()};
+  logo.onerror=function(){logo.remove()};wrapper.appendChild(logo);
+ }
+ return wrapper;
+}
+function normalizedStore(value){return String(value||"").toLowerCase().replace(/[^a-z0-9]+/g,"")}
+function findMerchantStore(name){
+ var n=normalizedStore(name);
+ if(!n)return null;
+ var aliases={"walmartcom":"walmart","walmart":"walmart","walmartmarketplace":"walmart","walgreens":"walgreens","walgreen":"walgreens","cvspharmacy":"cvs","thehomedepot":"homedepot","homedepot":"homedepot","samsclub":"samsclub"};
+ var direct=aliases[n];if(direct)return storesDirectory.find(function(s){return s.id===direct})||null;
+ return storesDirectory.find(function(s){return normalizedStore(s.name)===n||normalizedStore(s.domain)===n||normalizedStore(s.id)===n})||null;
+}
+function storeById(id){return storesDirectory.find(function(s){return s.id===id})||null}
+function matchesDirectory(){
+ var q=$("storeSearch").value.trim().toLowerCase(),cat=$("storeCategory").value;
+ return storesDirectory.filter(function(s){return (!q||s.name.toLowerCase().includes(q)||s.domain.includes(q))&&(!cat||s.category===cat)});
+}
+function redrawDirectory(){
+ var list=$("storeOptions");list.replaceChildren();var included=selectedRetailers(),isAll=currentStoreSelection===null;
+ matchesDirectory().forEach(function(s){
+  var item=document.createElement("label");item.className="store-choice"+((isAll||currentStoreSelection.includes(s.id))?" checked":"");
+  var checkbox=document.createElement("input");checkbox.type="checkbox";checkbox.checked=isAll||currentStoreSelection.includes(s.id);checkbox.setAttribute("aria-label","Include "+s.name);
+  checkbox.onchange=function(){
+   var ids=isAll?preferredStoreIds.slice():currentStoreSelection.slice();
+   if(checkbox.checked&&!ids.includes(s.id))ids.push(s.id);
+   if(!checkbox.checked)ids=ids.filter(function(id){return id!==s.id});
+   setDirectorySelection(ids.length===preferredStoreIds.length?null:ids);
+  };
+  var description=document.createElement("span");description.className="store-choice-info";
+  var title=document.createElement("b");title.textContent=s.name;var cat=document.createElement("small");cat.textContent=s.category;
+  description.appendChild(title);description.appendChild(cat);
+  item.appendChild(checkbox);item.appendChild(iconFor(s,false));item.appendChild(description);list.appendChild(item);
+ });
+ if(!list.childNodes.length){var empty=document.createElement("p");empty.className="muted";empty.textContent="No matching stores.";list.appendChild(empty)}
+ $("storeCount").textContent=isAll?"ALL "+storesDirectory.length:included.length+" / "+storesDirectory.length;
+ $("storeSelectionSummary").textContent=isAll?"All "+storesDirectory.length+" stores included. Actual prices appear only where connected data sources provide them.":included.length+" selected store"+(included.length===1?"":"s")+"; only available listings at these stores will be displayed.";
+ $("allStoresBtn").setAttribute("aria-pressed",isAll?"true":"false");
+ var preview=$("selectedStorePreview");preview.replaceChildren();
+ if(isAll){var allChip=document.createElement("span");allChip.className="store-preview-chip";allChip.textContent="🌐 All stores";preview.appendChild(allChip)}
+ else{included.slice(0,5).forEach(function(s){
+  var chip=document.createElement("span");chip.className="store-preview-chip";chip.appendChild(iconFor(s,true));
+  var name=document.createElement("span");name.textContent=s.name;chip.appendChild(name);preview.appendChild(chip);
+ });if(included.length>5){var extra=document.createElement("span");extra.className="store-preview-chip";extra.textContent="+"+(included.length-5)+" more";preview.appendChild(extra)}}
+}
+function setDirectorySelection(ids){
+ currentStoreSelection=ids===null?null:[...new Set(ids.filter(function(id){return preferredStoreIds.includes(id)}))];
+ storeSave("ss-selected-stores-v1",currentStoreSelection);redrawDirectory();
+ if(latestPriceData)redrawMarketGroups(latestPriceData);
+ if(!$("resultSection").classList.contains("hidden"))offers();
+}
+[...new Set(storesDirectory.map(function(s){return s.category}))].sort().forEach(function(c){
+ var option=document.createElement("option");option.value=c;option.textContent=c;$("storeCategory").appendChild(option)
+});
+storesDirectory.forEach(function(s){var option=document.createElement("option");option.value=s.id;option.textContent=s.name;$("retailer").appendChild(option)});
+$("storeSearch").addEventListener("input",redrawDirectory);
+$("storeCategory").addEventListener("change",redrawDirectory);
+$("allStoresBtn").onclick=function(){setDirectorySelection(null)};
+$("clearStoresBtn").onclick=function(){setDirectorySelection([])};
+$("selectMatchesBtn").onclick=function(){setDirectorySelection(matchesDirectory().map(function(s){return s.id}))};
+redrawDirectory();
+/* When no specific checkout retailer is chosen, the cart remains store-neutral. */
+getStore=function(){return storeById($("retailer").value)||{id:"other",name:"Store not decided",home:"",search:"https://www.google.com/search?q="}};
+offers=function(){
+ var name=$("productName").value.trim()||productCode||"product",query=encodeURIComponent(name),active=selectedRetailers();
+ $("storeChip").textContent=currentStoreSelection===null?"All "+storesDirectory.length+" stores":active.length+" selected stores";
+ var terms=[
+  ["Manufacturer coupons","Search for eligible manufacturer-issued offers.","https://www.google.com/search?q="+encodeURIComponent(name+" manufacturer coupon"),"Find coupons"],
+  ["Digital coupons","Offers may require activation in an official retailer account.","https://www.google.com/search?q="+encodeURIComponent(name+" digital coupon"),"Find digital deals"],
+  ["Rebates and cashback","These may credit after purchase rather than reduce checkout price.","https://www.google.com/search?q="+encodeURIComponent(name+" cashback rebate Ibotta Fetch"),"Explore rewards"],
+  ["Price comparisons","Compare exactly matching products, quantities and shipping costs.","https://www.google.com/search?tbm=shop&q="+query,"Compare prices"],
+  ["Search barcode","Look for promotions indexed by this exact product code.","https://www.google.com/search?q="+encodeURIComponent(productCode+" barcode coupon discount"),"Check barcode"],
+  ["Weekly sales and clearance","Check advertised promotions and clearance offers.","https://www.google.com/search?q="+encodeURIComponent(name+" weekly ads BOGO clearance"),"Find sales"]
+ ];
+ $("offerList").replaceChildren.apply($("offerList"),terms.map(function(row){return createOffer.apply(null,row)}));
+ var links=$("storeResultLinks");links.replaceChildren();
+ var sample=(currentStoreSelection===null?storesDirectory:active).slice(0,20);
+ sample.forEach(function(s){
+  var link=document.createElement("a");link.className="store-result-link";link.href="https://www.google.com/search?q="+encodeURIComponent("site:"+s.domain+" "+name);
+  link.target="_blank";link.rel="noopener noreferrer";link.appendChild(iconFor(s,true));
+  var label=document.createElement("span");label.textContent="Search "+s.name+" ↗";link.appendChild(label);links.appendChild(link);
+ });
+ if(active.length>sample.length){var more=document.createElement("p");more.className="muted";more.textContent="Showing "+sample.length+" of "+active.length+" store search shortcuts. Narrow the store selector to see different retailers.";links.appendChild(more)}
+ if(!active.length){var msg=document.createElement("p");msg.className="muted";msg.textContent="No stores selected. Use All Stores or select some stores.";links.appendChild(msg)}
+};
+$("productName").oninput=offers;
+function redrawMarketGroups(data){
+ var root=$("marketListings");root.replaceChildren();
+ var groups=new Map(),all=currentStoreSelection===null;
+ function push(item,observed){
+  var name=observed?item.store:item.merchant,store=findMerchantStore(name);
+  if(!all&&(!store||!currentStoreSelection.includes(store.id)))return;
+  var key=store?store.id:"unmapped:"+(name||"unknown");
+  var group=groups.get(key)||{name:store?store.name:(name||"Other merchant"),store:store,items:[]};
+  group.items.push({item,observed});groups.set(key,group);
+ }
+ (Array.isArray(data.merchant_listings)?data.merchant_listings:[]).forEach(function(item){push(item,false)});
+ (Array.isArray(data.historical_prices)?data.historical_prices:[]).forEach(function(item){push(item,true)});
+ [...groups.values()].sort(function(a,b){return Math.min.apply(null,a.items.map(function(x){return Number(x.item.price)||Infinity}))-Math.min.apply(null,b.items.map(function(x){return Number(x.item.price)||Infinity}))}).forEach(function(group){
+  var section=document.createElement("section");section.className="market-group";
+  var header=document.createElement("div");header.className="market-group-title";header.appendChild(iconFor(group.store||{name:group.name,domain:""},false));
+  var title=document.createElement("span");title.textContent=group.name;header.appendChild(title);
+  var count=document.createElement("small");count.textContent=group.items.length+" price reference"+(group.items.length===1?"":"s");header.appendChild(count);section.appendChild(header);
+  var grid=document.createElement("div");grid.className="market-grid";
+  group.items.forEach(function(ref){grid.appendChild(marketCard(ref.item,ref.observed))});section.appendChild(grid);root.appendChild(section);
+ });
+ if(groups.size)marketMessage(groups.size+" store/merchant group"+(groups.size===1?"":"s")+" returned by connected price feeds. Reported prices are not guaranteed live in-store checkout prices.",false);
+ else if(!all)marketMessage("No usable price references returned for your selected stores. This does not mean no deals exist.",true);
+ else marketMessage("No recent usable price references returned by connected feeds. The "+storesDirectory.length+"-store directory is not "+storesDirectory.length+" live price integrations.",true);
+}
+loadMarketData=async function(code,token){
+ latestPriceData=null;$("marketListings").replaceChildren();marketMessage("Checking available product pricing feeds…",false);
+ try{
+  var controller=new AbortController(),timer=setTimeout(function(){controller.abort()},17000),resp;
+  try{resp=await fetch(API_BASE+"/api/lookup?code="+encodeURIComponent(code),{signal:controller.signal,headers:{"Accept":"application/json"}})}finally{clearTimeout(timer)}
+  if(token!==renderToken)return;
+  if(!resp.ok)throw Error("Price source unavailable");
+  var data=await resp.json();if(token!==renderToken)return;
+  if(data.product&&data.product.title&&!$("productName").value.trim()){
+   $("productName").value=data.product.title;foundName=data.product.title;
+   showProduct(foundName,data.product.brand||"",data.product.image||null,code);offers();addRecent(code,foundName);
+  }
+  latestPriceData=data;redrawMarketGroups(data);
+ }catch(err){if(token===renderToken)marketMessage("Price feeds are currently unavailable. Enter shelf prices yourself to continue.",true)}
+};
+drawStores=function(){
+ var area=$("storeList");area.replaceChildren();
+ var shortlisted=favorites.length?storesDirectory.filter(function(s){return favorites.includes(s.id)}).slice(0,14):storesDirectory.slice(0,12);
+ shortlisted.forEach(function(s){
+  var line=document.createElement("div");line.className="store";
+  var left=document.createElement("div");left.style.display="flex";left.style.alignItems="center";left.style.gap="7px";left.appendChild(iconFor(s,true));
+  var details=document.createElement("div");var label=document.createElement("label");label.textContent=s.name;
+  var a=document.createElement("a");a.textContent="Official website ↗";a.href="https://"+s.domain+"/";a.target="_blank";a.rel="noopener noreferrer";
+  details.appendChild(label);details.appendChild(document.createElement("br"));details.appendChild(a);left.appendChild(details);
+  var button=document.createElement("button");button.type="button";button.textContent=favorites.includes(s.id)?"★":"☆";button.title="Toggle "+s.name+" favorite";button.onclick=function(){favorites=favorites.includes(s.id)?favorites.filter(function(id){return id!==s.id}):favorites.concat(s.id);storeSave("ss-favorites",favorites);drawStores()};
+  line.appendChild(left);line.appendChild(button);area.appendChild(line);
+ });
+ var more=document.createElement("a");more.href="#storePicker";more.className="store-result-link";more.textContent="Browse all "+storesDirectory.length+" stores ↑";area.appendChild(more);
+};
+drawStores();
+var originalCheckoutStoreInfo=checkoutStoreInfo;
+checkoutStoreInfo=function(id){
+ var known=["target","walmart","costco","walgreens","cvs","kroger","safeway"];
+ if(known.includes(id)||id==="other")return originalCheckoutStoreInfo(id);
+ var s=storeById(id);
+ if(!s)return originalCheckoutStoreInfo("other");
+ return {name:s.name,link:"https://"+s.domain+"/",action:"Open official "+s.name+" website"};
+};
 
 })();
 </script>
