@@ -98,7 +98,7 @@
  <div class="actions"><button id="moreSavingsBtn" class="btn" type="button">KEEP LOOKING</button><button id="dismissCouponBtn" class="btn secondary" type="button">CLOSE</button></div></div>
 </div>
 <div id="scannerOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Product scanner"><div class="scanner"><div class="scanner-head"><h2 id="scannerTitle">Scan product code</h2><button id="closeScanner" type="button">Close ✕</button></div><video id="video" playsinline autoplay muted></video><p id="scannerHelp">Allow camera access and aim at your product's barcode.</p></div></div>
-<footer class="foot">ScanSave Beta • No automatic retailer integrations yet • Discounts must be verified at checkout • Not affiliated with named retailers.<br>Product names sourced from the Open Facts catalogs where available. No retailer passwords collected.</footer>
+<footer class="foot">ScanSave Beta • No automatic retailer integrations yet • Discounts must be verified at checkout • Not affiliated with named retailers.<br>Product information: Open Food Facts/Open Facts projects. Price observations: <a href="https://prices.openfoodfacts.org/" target="_blank" rel="noopener noreferrer">Open Prices</a> contributors (<a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener noreferrer">ODbL</a>). No retailer passwords collected.</footer>
 
 <script>
 
@@ -160,7 +160,7 @@ function marketMessage(txt,isError){var node=$("marketStatus");node.textContent=
 function marketCard(item,observed){
  var c=document.createElement("div");c.className="market-card";
  var title=document.createElement("strong");title.textContent=observed?(item.store||"Reported store"):(item.merchant||"Merchant listing");
- var amount=document.createElement("div");amount.className="price";amount.textContent=money(item.price);
+ var amount=document.createElement("div");amount.className="price";amount.textContent=(observed||item.currency==="USD")?money(item.price):Number(item.price).toFixed(2)+" (currency unconfirmed)";
  var info=document.createElement("div");info.className="meta";
  info.textContent=observed?"Crowdsourced receipt or shelf observation from "+item.date+(item.city?" • "+item.city:"")+". Not a live store price.":"Merchant listing last updated "+item.last_updated+". "+(item.currency_note||"Check currency and availability.");
  c.appendChild(title);c.appendChild(amount);c.appendChild(info);
@@ -175,6 +175,7 @@ function marketCard(item,observed){
  var use=document.createElement("button");use.type="button";use.className="btn outline";
  use.textContent="USE AS PRICE ESTIMATE";
  use.onclick=function(){
+  if(!observed&&item.currency!=="USD"&&!window.confirm("This listing did not specify currency. Treat this amount as USD for a provisional estimate?"))return;
   $("shelfPrice").value=Number(item.price).toFixed(2);calculation();
   marketMessage("Price estimate filled from a "+(observed?"dated observation":"merchant listing")+". Confirm the actual shelf price and retailer eligibility before checkout.",true);
  };
