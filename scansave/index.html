@@ -161,7 +161,7 @@ body.app-ready .app-pages{display:block}
   <div id="product" class="product"></div>
   <div class="subhead">Automatic price discovery</div>
   <div id="marketStatus" class="market-summary" aria-live="polite">Checking merchant listings and available reported prices…</div>
-  <div class="compare-actions"><span class="compare-coverage" id="compareCoverage">10 retailer connectors • 2 public price sources</span><button id="compareRefreshBtn" type="button" class="btn small outline">RECHECK PRICES</button></div>
+  <div class="compare-actions"><span class="compare-coverage" id="compareCoverage">10 retailer searches • 2 public price sources</span><button id="compareRefreshBtn" type="button" class="btn small outline">RECHECK PRICES</button></div>
   <div id="marketListings" class="market-groups"></div>
   <p class="muted">Store search links are shortcuts, not guaranteed API integrations. Official product pages can sometimes provide a barcode-matched advertised price; website robots rules and availability are respected.</p>
   <div class="market-note">Pricing sources may be limited, delayed, or unavailable. Merchant listings are not guaranteed in-store shelf prices. We never invent a discount.</div>
@@ -551,7 +551,7 @@ async function lookup(){
   else{msg("This does not look like an 8–14 digit UPC/EAN product barcode.","error")}
   return;
  }
- productCode=code;["shelfPrice","instantDiscount","futureReward","taxAmount"].forEach(function(id){$(id).value=""});$("qty").value="1";calculation();var token=++renderToken;loadMarketData(code,token);$("resultSection").classList.remove("hidden");showPage("deals");$("productName").value="";foundName="";
+ productCode=code;["shelfPrice","instantDiscount","futureReward","taxAmount"].forEach(function(id){$(id).value=""});$("qty").value="1";calculation();var token=++renderToken;$("resultSection").classList.remove("hidden");showPage("deals");$("productName").value="";$("retailerProductURL").value="";foundName="";loadMarketData(code,token);
  showProduct("Looking up product…","",null,code);msg("Looking up barcode in the public product database…");
  try{
   var sources=[
@@ -1107,7 +1107,7 @@ function redrawMarketGroups(data){
  var selected=Array.isArray(data.store_connectors)?data.store_connectors:[],
      counted=selected.reduce(function(n,s){return n+(s.reported_count||0)},0),
      baseline=Number($("shelfPrice").value)||0;
- $("compareCoverage").textContent=selected.length+" retailer search connectors • "+(data.connected_price_sources||[]).length+" public price sources";
+ $("compareCoverage").textContent=selected.length+" retailer searches • "+(data.connected_price_sources||[]).length+" public price sources";
  if(data.retailer_page){
   var site=data.retailer_page;
   var panel=document.createElement("div");panel.className="compare-page-result";
@@ -1139,7 +1139,7 @@ function redrawMarketGroups(data){
  }
  var status=data.source_status||{};
  if(counted>0){
-  marketMessage("Found "+counted+" dated barcode-matched price reference"+(counted===1?"":"s")+" across "+selected.length+" retailer connectors. Prices are observations, not verified live checkout totals.",false);
+  marketMessage("Found "+counted+" dated barcode-matched price reference"+(counted===1?"":"s")+" across "+selected.length+" retailer searches. Prices are observations, not verified live checkout totals.",false);
  }else{
   marketMessage("No usable matching USD price from the connected sources. Price feeds: UPCitemdb "+(status.upcitemdb||"unknown")+"; Open Prices "+(status.open_prices||"unknown")+". Use the official store search links below, or enter a valid product-page URL.",true);
  }
