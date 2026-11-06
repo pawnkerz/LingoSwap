@@ -100,6 +100,31 @@ body.app-ready .app-pages{display:block}
 .coupon-verification{font-size:11px;color:#55744b;font-weight:750}
 .coupon-warning{font-size:12px;color:#526c44;line-height:1.5}
 
+
+.compare-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0}
+.compare-coverage{font-size:11px;font-weight:850;color:#527c3b;line-height:1.5}
+.compare-actions .btn{padding:8px 10px;font-size:11px}
+.compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.compare-card{padding:13px;border:1px solid #d6e8c7;border-radius:14px;background:#fff;display:grid;gap:9px}
+.compare-card.available{border-color:#abd992;background:#f9fff4}
+.compare-card .heading{display:flex;gap:9px;align-items:center}
+.compare-card .heading strong{font-size:13px;line-height:1.25}
+.compare-card .heading .state{margin-left:auto;font-size:10px;font-weight:850;color:#5e794f}
+.compare-card .price{font-size:26px;font-weight:950;letter-spacing:-.04em;color:#235e15}
+.compare-card .unavailable{font-size:12px;color:#72806a}
+.compare-card .detail{font-size:11px;color:#586f4e;line-height:1.45}
+.compare-card .sources{display:grid;gap:5px}
+.compare-card .sources>div{padding:7px;border-top:1px solid #dfebd7;display:flex;justify-content:space-between;gap:10px;font-size:11px}
+.compare-card .sources b{color:#305d23}
+.compare-card .external{font-size:12px;font-weight:850;color:#2f7919;text-decoration:none}
+.compare-card .potential{font-size:11px;padding:9px;background:#e6ffd6;border-radius:9px;color:#1e6a11;font-weight:800}
+.compare-empty-source{padding:13px;border:1px solid #d5e5c8;background:#f6fff0;border-radius:12px;line-height:1.6;font-size:12px;color:#466537}
+.compare-page-result{border:1.5px solid #8cc979;padding:13px;border-radius:12px;background:#eefde9;margin:11px 0;display:grid;gap:6px}
+.compare-page-result strong{font-size:14px;color:#225e16}
+.compare-page-result .price{font-size:24px;color:#256b16;font-weight:950}
+.compare-page-result .meta{font-size:11px;color:#587b47}
+@media(max-width:560px){.compare-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 
@@ -136,7 +161,9 @@ body.app-ready .app-pages{display:block}
   <div id="product" class="product"></div>
   <div class="subhead">Automatic price discovery</div>
   <div id="marketStatus" class="market-summary" aria-live="polite">Checking merchant listings and available reported prices…</div>
+  <div class="compare-actions"><span class="compare-coverage" id="compareCoverage">10 retailer connectors • 2 public price sources</span><button id="compareRefreshBtn" type="button" class="btn small outline">RECHECK PRICES</button></div>
   <div id="marketListings" class="market-groups"></div>
+  <p class="muted">Store search links are shortcuts, not guaranteed API integrations. Official product pages can sometimes provide a barcode-matched advertised price; website robots rules and availability are respected.</p>
   <div class="market-note">Pricing sources may be limited, delayed, or unavailable. Merchant listings are not guaranteed in-store shelf prices. We never invent a discount.</div>
   <div class="field"><label class="label" for="productName">Product name (edit if needed)</label><input id="productName" class="input" placeholder="Enter a product name if lookup fails"></div>
   <div class="subhead">Enter your in-store price</div>
@@ -152,7 +179,7 @@ body.app-ready .app-pages{display:block}
   <div id="addCartStatus" class="notice hidden" role="status"></div>
   <div class="field"><label class="label" for="retailer">Store for checkout (optional)</label><select id="retailer" class="input"><option value="other">Not decided yet</option></select><p class="muted">Used only to organize checkout instructions. Your search can include multiple stores.</p></div>
   <div class="subhead">Deal finder</div>
-  <div class="field"><label class="label" for="retailerProductURL">Retailer product page (optional, for verified code providers)</label><input type="url" id="retailerProductURL" class="input" placeholder="https://www.target.com/p/..." autocomplete="url"><p class="muted">Optional direct product link, never a login link. Use the exact online product page when checking available promo codes. ScanSave never attempts checkout or uses retailer login credentials.</p></div>
+  <div class="field"><label class="label" for="retailerProductURL">Retailer product page (optional, for verified code providers)</label><input type="url" id="retailerProductURL" class="input" placeholder="https://www.target.com/p/..." autocomplete="url"><p class="muted">Optional exact product link from one of the ten comparison retailers. ScanSave checks permitted public product-page price markup and online promotional codes, without retailer login or automatic checkout.</p></div>
   <div class="actions" style="margin-bottom:10px"><button class="btn outline" id="recheckCouponBtn" type="button">RECHECK COUPON FEEDS</button></div>
   <div class="chips"><span id="storeChip" class="chip">Store</span><span class="chip">Live search shortcuts</span><span class="chip">No invented coupon codes</span></div>
   <div id="couponStatus" class="coupon-status working hidden" role="status" aria-live="polite"><span id="couponStatusIcon" class="status-icon">🔎</span><div><strong id="couponStatusTitle">Checking offers</strong><p id="couponStatusMessage"></p></div></div>
@@ -750,7 +777,7 @@ function redrawDirectory(){
 function setDirectorySelection(ids){
  currentStoreSelection=ids===null?null:[...new Set(ids.filter(function(id){return preferredStoreIds.includes(id)}))];
  storeSave("ss-selected-stores-v1",currentStoreSelection);redrawDirectory();
- if(latestPriceData)redrawMarketGroups(latestPriceData);
+ if(productCode&&!$("resultSection").classList.contains("hidden"))loadMarketData(productCode,renderToken);
  if(!$("resultSection").classList.contains("hidden"))offers();
 }
 [...new Set(storesDirectory.map(function(s){return s.category}))].sort().forEach(function(c){
@@ -1030,6 +1057,125 @@ $("importHistoryFile").onchange=async function(){
  }catch(e){feedbackHistory("Could not restore: choose a valid ScanSave savings backup.",true)}finally{this.value=""}
 };
 renderHistory();
+
+
+/* First-party independent comparison engine. Public source observations are dated,
+   store links are never represented as active price API integrations. */
+var compareStoreIds=["walmart","target","costco","walgreens","cvs","kroger","safeway","bestbuy","homedepot","lowes"];
+function comparisonStoreFilter(){
+ if(currentStoreSelection===null)return "all";
+ return currentStoreSelection.filter(function(id){return compareStoreIds.includes(id)}).join(",")||"none";
+}
+function addCompareCard(store,baseline){
+ var card=document.createElement("article");card.className="compare-card"+(store.reported_count>0?" available":"");
+ var top=document.createElement("div");top.className="heading";
+ var found=storeById(store.id)||{name:store.name,domain:store.logo_domain};
+ top.appendChild(iconFor(found,false));
+ var h=document.createElement("strong");h.textContent=store.name;top.appendChild(h);
+ var flag=document.createElement("span");flag.className="state";flag.textContent=store.reported_count>0?"REPORTED":"NO PRICE DATA";
+ top.appendChild(flag);card.appendChild(top);
+ if(store.reported_count>0&&typeof store.lowest_reported_price==="number"){
+  var price=document.createElement("div");price.className="price";price.textContent=money(store.lowest_reported_price);card.appendChild(price);
+  var kind=document.createElement("div");kind.className="detail";
+  kind.textContent="Lowest available barcode-matched reported price. Check date and store before shopping.";card.appendChild(kind);
+  var rows=document.createElement("div");rows.className="sources";
+  (store.offers||[]).slice(0,3).forEach(function(offer){
+   var line=document.createElement("div");
+   var source=document.createElement("span");source.textContent=offer.source+" • "+offer.observed_date;
+   var value=document.createElement("b");value.textContent=money(offer.unit_price);
+   line.appendChild(source);line.appendChild(value);rows.appendChild(line);
+  });
+  card.appendChild(rows);
+  if(baseline>0&&baseline>store.lowest_reported_price){
+   var gap=document.createElement("div");gap.className="potential";
+   gap.textContent="Possible price difference vs your entered shelf price: "+money(baseline-store.lowest_reported_price)+" (not confirmed savings)";
+   card.appendChild(gap);
+  }
+ }else{
+  var empty=document.createElement("div");empty.className="unavailable";
+  empty.textContent="No recent matching USD price from connected public feeds. Store may still have an offer.";card.appendChild(empty);
+ }
+ var a=document.createElement("a");a.className="external";a.href=store.search_url;a.target="_blank";
+ a.rel="noopener noreferrer";a.textContent="Search "+store.name+" directly ↗";card.appendChild(a);
+ return card;
+}
+function redrawMarketGroups(data){
+ var root=$("marketListings");root.replaceChildren();
+ if(!data||!Array.isArray(data.store_connectors)){
+  marketMessage("Comparison data is temporarily unavailable. Enter your shelf price to continue.",true);return
+ }
+ var selected=Array.isArray(data.store_connectors)?data.store_connectors:[],
+     counted=selected.reduce(function(n,s){return n+(s.reported_count||0)},0),
+     baseline=Number($("shelfPrice").value)||0;
+ $("compareCoverage").textContent=selected.length+" retailer search connectors • "+(data.connected_price_sources||[]).length+" public price sources";
+ if(data.retailer_page){
+  var site=data.retailer_page;
+  var panel=document.createElement("div");panel.className="compare-page-result";
+  if(site.status==="reported"&&Array.isArray(site.offers)&&site.offers.length){
+   var item=site.offers[0];
+   var title=document.createElement("strong");title.textContent=item.store_name+" • Exact-barcode product-page price";
+   var price=document.createElement("div");price.className="price";price.textContent=money(item.price);
+   var note=document.createElement("div");note.className="meta";note.textContent="Public retailer page reported this price when checked. It may differ by store, stock, taxes and shipping. No coupon redemption is implied.";
+   panel.appendChild(title);panel.appendChild(price);panel.appendChild(note);root.appendChild(panel);
+  }else{
+   var msg=document.createElement("div");msg.className="compare-empty-source";
+   msg.textContent="Product-page check: "+String(site.status||"unavailable").replace(/_/g," ")+". The retailer may restrict automated reading or omit exact UPC/GTIN markup. No price was inferred.";
+   root.appendChild(msg);
+  }
+ }
+ if(!selected.length){
+  var n=document.createElement("div");n.className="compare-empty-source";
+  n.textContent="None of the ten comparison connectors is selected. All 106 directory stores remain searchable in the Stores tab. Include one of the ten supported retailers to see current connected-source comparisons.";
+  root.appendChild(n);
+ }else{
+  var grid=document.createElement("div");grid.className="compare-grid";
+  selected.slice().sort(function(a,b){
+   if(a.reported_count>0&&b.reported_count===0)return -1;
+   if(a.reported_count===0&&b.reported_count>0)return 1;
+   if(a.reported_count>0&&b.reported_count>0)return a.lowest_reported_price-b.lowest_reported_price;
+   return a.name.localeCompare(b.name)
+  }).forEach(function(store){grid.appendChild(addCompareCard(store,baseline))});
+  root.appendChild(grid);
+ }
+ var status=data.source_status||{};
+ if(counted>0){
+  marketMessage("Found "+counted+" dated barcode-matched price reference"+(counted===1?"":"s")+" across "+selected.length+" retailer connectors. Prices are observations, not verified live checkout totals.",false);
+ }else{
+  marketMessage("No usable matching USD price from the connected sources. Price feeds: UPCitemdb "+(status.upcitemdb||"unknown")+"; Open Prices "+(status.open_prices||"unknown")+". Use the official store search links below, or enter a valid product-page URL.",true);
+ }
+}
+loadMarketData=async function(code,token){
+ latestPriceData=null;$("marketListings").replaceChildren();
+ marketMessage("Comparing barcode-matched prices from public data feeds…",false);
+ var ctl=new AbortController(),timer=setTimeout(function(){ctl.abort()},17000);
+ try{
+  var params=new URLSearchParams({code:code,stores:comparisonStoreFilter()});
+  var name=$("productName").value.trim();if(name)params.set("name",name);
+  var baseline=Number($("shelfPrice").value);
+  if(Number.isFinite(baseline)&&baseline>0)params.set("baseline_price",baseline.toFixed(2));
+  var url=$("retailerProductURL").value.trim();if(url)params.set("product_url",url);
+  var res=await fetch(API_BASE+"/api/compare?"+params.toString(),{signal:ctl.signal,headers:{"Accept":"application/json"}});
+  if(token!==renderToken)return;
+  if(!res.ok)throw Error("Comparison source responded "+res.status);
+  var data=await res.json();if(token!==renderToken)return;
+  if(data.product&&data.product.title&&!$("productName").value.trim()){
+   $("productName").value=data.product.title;foundName=data.product.title;
+   showProduct(foundName,data.product.brand||"",data.product.image||null,code);offers();addRecent(code,foundName);
+  }
+  latestPriceData=data;redrawMarketGroups(data);
+ }catch(error){
+  if(token!==renderToken)return;
+  marketMessage("Comparison services were unavailable. You can still search stores using the links and calculate your confirmed savings manually.",true);
+ }finally{clearTimeout(timer)}
+};
+$("compareRefreshBtn").onclick=function(){
+ if(!productCode)return;
+ loadMarketData(productCode,renderToken);
+};
+$("retailerProductURL").addEventListener("change",function(){
+ if(productCode&&!$("resultSection").classList.contains("hidden"))loadMarketData(productCode,renderToken)
+});
+$("shelfPrice").addEventListener("input",function(){if(latestPriceData&&latestPriceData.store_connectors)redrawMarketGroups(latestPriceData)});
 
 document.body.classList.add("app-ready");
 showPage("scan");
