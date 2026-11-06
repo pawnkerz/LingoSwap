@@ -41,7 +41,12 @@ function matchMerchant(name){
   'kroger':'kroger','target':'target','costco':'costco','lowes':'lowes'
  };
  const match=alias[m]||m;
- return RETAILERS.find(x=>x.id===match||cleanName(x.name)===m)||null;
+ const exact=RETAILERS.find(x=>x.id===match||cleanName(x.name)===m);
+ if(exact)return exact;
+ const raw=String(name||'').toLowerCase();
+ // Only recognize a physical store's suffix when the full retailer name
+ // precedes a word boundary (Kroger Main, Target #123); not vague substring matches.
+ return RETAILERS.find(x=>raw.startsWith(x.name.toLowerCase()+' ')||raw.startsWith(x.name.toLowerCase()+' #'))||null;
 }
 function isCode(code){return /^\d{8,14}$/.test(String(code||''))}
 function sameGTIN(a,b){
