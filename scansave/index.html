@@ -60,7 +60,7 @@ body.app-ready .app-pages{display:block}
 .scanner-corner.top-right{top:0;right:0;border-top-width:4px;border-right-width:4px}
 .scanner-corner.bottom-left{bottom:0;left:0;border-bottom-width:4px;border-left-width:4px}
 .scanner-corner.bottom-right{bottom:0;right:0;border-bottom-width:4px;border-right-width:4px}
-.scanner-laser{position:absolute;left:4%;right:4%;top:3%;height:3px;background:#b8ff38;box-shadow:0 0 9px 3px #b8ff3866;border-radius:999px;animation:scannerSweep 2.1s ease-in-out infinite alternate}
+.scanner-unavailable .scanner-laser{display:none}.scanner-unavailable .scanner-camera{border:1px solid #b8ff38}.scanner-unavailable .scanner-camera video{opacity:.12}.scanner-laser{position:absolute;left:4%;right:4%;top:3%;height:3px;background:#b8ff38;box-shadow:0 0 9px 3px #b8ff3866;border-radius:999px;animation:scannerSweep 2.1s ease-in-out infinite alternate}
 @keyframes scannerSweep{0%{top:4%}100%{top:95%}}@media(prefers-reduced-motion:reduce){.scanner-laser{animation:none;top:50%}}
 .scan-modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
 .scan-modes button{padding:10px;border-radius:10px;border:1px solid #739864;background:#25351d;color:#e0ebd8;font-size:13px;font-weight:850}
@@ -181,7 +181,7 @@ body.app-ready .app-pages{display:block}
  <div class="coupon-dialog"><div class="sad">😔</div><h2 id="couponDialogTitle">Sorry, no verified coupons found.</h2><p id="couponDialogText">No qualifying offer was found in the sources checked. Other savings may still exist.</p>
  <div class="actions"><button id="moreSavingsBtn" class="btn" type="button">KEEP LOOKING</button><button id="dismissCouponBtn" class="btn secondary" type="button">CLOSE</button></div></div>
 </div>
-<div id="scannerOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Product scanner"><div class="scanner"><div class="scanner-head"><h2 id="scannerTitle">Scan product code</h2><button id="closeScanner" type="button">Close ✕</button></div><div class="scanner-camera"><video id="video" playsinline autoplay muted></video><div class="scanner-frame" aria-hidden="true"><span class="scanner-corner top-left"></span><span class="scanner-corner top-right"></span><span class="scanner-corner bottom-left"></span><span class="scanner-corner bottom-right"></span><span class="scanner-laser"></span></div></div><div class="scan-modes"><button id="liveBarcodeMode" class="active" type="button">▥ BARCODE</button><button id="liveQrMode" type="button">▦ QR CODE</button></div><p id="scannerHelp">Align a product barcode inside the neon scanning frame.</p><button id="manualScanBtn" type="button" class="manual-scan">ENTER CODE MANUALLY</button></div></div>
+<div id="scannerOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Product scanner"><div class="scanner"><div class="scanner-head"><h2 id="scannerTitle">Scan product code</h2><button id="closeScanner" type="button">Close ✕</button></div><div class="scanner-camera"><video id="video" playsinline autoplay muted></video><div class="scanner-frame" aria-hidden="true"><span class="scanner-corner top-left"></span><span class="scanner-corner top-right"></span><span class="scanner-corner bottom-left"></span><span class="scanner-corner bottom-right"></span><span class="scanner-laser"></span></div></div><div class="scan-modes"><button id="liveBarcodeMode" class="active" type="button">▥ BARCODE</button><button id="liveQrMode" type="button">▦ QR CODE</button></div><p id="scannerHelp">Align a product barcode inside the neon scanning frame.</p><button id="retryScanBtn" type="button" class="manual-scan hidden">RETRY CAMERA</button><button id="manualScanBtn" type="button" class="manual-scan">ENTER CODE MANUALLY</button></div></div>
 <footer class="foot">ScanSave Beta • No automatic retailer integrations yet • Discounts must be verified at checkout • Not affiliated with named retailers.<br>Product information: Open Food Facts/Open Facts projects. Price observations: <a href="https://prices.openfoodfacts.org/" target="_blank" rel="noopener noreferrer">Open Prices</a> contributors (<a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener noreferrer">ODbL</a>). No retailer passwords collected.</footer>
 
 <script>
@@ -470,9 +470,18 @@ function stopScanner(){
  $("scannerOverlay").classList.add("hidden");
 }
 async function startScanner(){
- if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg("Camera scanning requires HTTPS and browser camera permission. Please enter the barcode manually.","error");return}
  $("scannerTitle").textContent=mode==="qr"?"Scan QR code":"Scan product barcode";
- $("scannerOverlay").classList.remove("hidden");$("scannerHelp").textContent="Allow camera access. Position the code inside the camera view.";
+ $("scannerOverlay").classList.remove("hidden");
+ $("scannerOverlay").classList.remove("scanner-unavailable");
+ $("retryScanBtn").classList.add("hidden");
+ $("scannerHelp").textContent="Allow camera access. Position the code inside the camera view.";
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+  $("scannerOverlay").classList.add("scanner-unavailable");
+  $("retryScanBtn").classList.remove("hidden");
+  $("scannerHelp").textContent="Camera not available in this browser. Please open ScanSave in your phone browser over HTTPS, allow camera access, or enter the code manually.";
+  msg("Camera permission unavailable; scanner is open with manual fallback.","error");
+  return;
+ }
  scanning=true;var video=$("video");
  try{
   if("BarcodeDetector" in window){
@@ -499,7 +508,7 @@ async function startScanner(){
   scanControls=await codeReader.decodeFromConstraints({audio:false,video:{facingMode:"environment"}},video,function(result){
    if(result&&scanning){var value=result.getText();stopScanner();$("code").value=value;lookup()}
   });
- }catch(error){stopScanner();msg("Camera scan unavailable ("+safeText(error.message)+"). Try manual entry.","error")}
+ }catch(error){stopScanner();$("scannerOverlay").classList.remove("hidden");$("scannerOverlay").classList.add("scanner-unavailable");$("retryScanBtn").classList.remove("hidden");$("scannerHelp").textContent="Camera could not start: "+safeText(error.message)+". Check camera permissions or enter the barcode manually.";msg("Camera scan unavailable. Use Retry Camera or manual entry.","error")}
 }
 $("cameraBtn").onclick=startScanner;$("closeScanner").onclick=stopScanner;
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){stopScanner();hideCouponNotice()}});
@@ -792,6 +801,7 @@ $("scanNextBtn").onclick=openLiveScanner;
 $("scanFromDealsBtn").onclick=openLiveScanner;
 $("cameraBtn").onclick=openLiveScanner;
 $("manualScanBtn").onclick=function(){stopScanner();showPage("scan");$("code").focus()};
+$("retryScanBtn").onclick=function(){stopScanner();startScanner()};
 function syncLiveMode(){
  $("liveBarcodeMode").classList.toggle("active",mode==="barcode");
  $("liveQrMode").classList.toggle("active",mode==="qr");
