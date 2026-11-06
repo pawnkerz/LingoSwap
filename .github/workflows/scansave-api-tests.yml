@@ -5,6 +5,8 @@ on:
     paths:
       - 'scansave/server.js'
       - 'scansave/server.test.js'
+      - 'scansave/compare.js'
+      - 'scansave/compare.test.js'
       - 'scansave/stores.json'
       - '.github/workflows/scansave-api-tests.yml'
   workflow_dispatch:
@@ -20,4 +22,4 @@ jobs:
       - name: Check Node API syntax
         run: node --check scansave/server.js
       - name: Run ScanSave coupon tests
-        run: node --test scansave/server.test.js
+        run: node --test scansave/server.test.js scansave/compare.test.js
