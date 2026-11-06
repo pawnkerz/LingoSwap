@@ -1,0 +1,23 @@
+name: ScanSave API checks
+on:
+  push:
+    branches: [scansave-standalone-preview]
+    paths:
+      - 'scansave/server.js'
+      - 'scansave/server.test.js'
+      - 'scansave/stores.json'
+      - '.github/workflows/scansave-api-tests.yml'
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check Node API syntax
+        run: node --check scansave/server.js
+      - name: Run ScanSave coupon tests
+        run: node --test scansave/server.test.js
