@@ -1,5 +1,6 @@
 'use strict';
 const http = require('node:http');
+const comparison=require('./compare');
 const { URL } = require('node:url');
 const PORT = Number(process.env.PORT || 10000);
 const ORIGIN = 'https://scansave-beta.onrender.com';
@@ -239,19 +240,45 @@ const server=http.createServer(async(req,res)=>{
  const origin=req.headers.origin||'';
  if(req.method==='OPTIONS'){res.writeHead(204,{'Access-Control-Allow-Origin':ORIGIN,'Access-Control-Allow-Methods':'GET,OPTIONS','Access-Control-Allow-Headers':'Content-Type','Vary':'Origin'});res.end();return}
  if(req.method!=='GET'){json(res,405,{error:'METHOD_NOT_ALLOWED'},origin);return}
- if(host.pathname==='/health'){json(res,200,{ok:true,app:'ScanSave API',coupon_provider_configured:!!(process.env.SOVRN_SECRET_KEY&&process.env.SOVRN_SITE_API_KEY),
+ if(host.pathname==='/health'){json(res,200,{ok:true,app:'ScanSave API',
+ comparison_connectors:comparison.RETAILERS.length,
+ comparison_price_sources:['Open Prices','UPCitemdb'],
+ retailer_product_page_reader:'robots-respecting structured data, requires exact barcode',coupon_provider_configured:!!(process.env.SOVRN_SECRET_KEY&&process.env.SOVRN_SITE_API_KEY),
  coupon_provider:'Sovrn product promo codes',coupon_source_status:(process.env.SOVRN_SECRET_KEY&&process.env.SOVRN_SITE_API_KEY)?'configured':'approval_or_keys_required',
  supported_retailer_urls:SUPPORTED_HOSTS.length,price_sources:['UPCitemdb','Open Prices']},origin);return}
- if(!['/api/lookup','/api/offers'].includes(host.pathname)){json(res,404,{error:'NOT_FOUND'},origin);return}
+ if(!['/api/lookup','/api/offers','/api/compare','/api/retailer-page'].includes(host.pathname)){json(res,404,{error:'NOT_FOUND'},origin);return}
  const ip=String(req.headers['x-forwarded-for']||req.socket.remoteAddress||'anonymous').split(',')[0].trim();
  const t=Date.now();let record=requestLog.get(ip)||{t,used:0};if(t-record.t>60000)record={t,used:0};record.used++;requestLog.set(ip,record);
  if(record.used>20){json(res,429,{error:'RATE_LIMITED'},origin);return}
  if(requestLog.size>10000)requestLog.clear();
  try{
+  if(host.pathname==='/api/compare'){
+   const code=host.searchParams.get('code')||'';
+   if(!codeOK(code)){json(res,400,{error:'INVALID_BARCODE'},origin);return}
+   const data=await cached('comparison-source:'+code,120000,()=>lookup(code));
+   const result=comparison.buildCompareResult(data,{
+    code,stores:host.searchParams.get('stores')||'all',
+    name:host.searchParams.get('name')||data.product?.title||'',
+    baseline_price:host.searchParams.get('baseline_price')||''
+   });
+   const productURL=host.searchParams.get('product_url');
+   if(productURL){
+    result.retailer_page=await comparison.lookupRetailerPage(code,productURL);
+    // Page price is a separate verified-GTIN source, never injected into guaranteed savings.
+   }
+   json(res,200,result,origin);return;
+  }
+  if(host.pathname==='/api/retailer-page'){
+   const code=host.searchParams.get('code')||'';
+   if(!codeOK(code)){json(res,400,{error:'INVALID_BARCODE'},origin);return}
+   const url=host.searchParams.get('product_url')||'';
+   const result=await comparison.lookupRetailerPage(code,url);
+   json(res,200,result,origin);return;
+  }
   if(host.pathname==='/api/lookup'){const code=host.searchParams.get('code')||'';if(!codeOK(code)){json(res,400,{error:'INVALID_BARCODE'},origin);return}
    const data=await lookup(code);json(res,200,data,origin);return}
   const [result,other]=await Promise.all([couponOffers(host.searchParams.get('product_url')||''),discoverPublicDeals(host.searchParams.get('q')||'',host.searchParams.get('stores')||host.searchParams.get('store')||'all')]);json(res,200,{...result,related_deals:other.offers,related_deal_feed_status:other.status},origin);
  }catch(e){json(res,503,{error:'DATA_SOURCES_UNAVAILABLE'},origin)}
 });
 if(require.main===module){server.listen(PORT,'0.0.0.0',()=>console.log('ScanSave API listening on '+PORT))}
-module.exports={server,normalizeSovrn,parseRetailerURL,couponOffers,STORE_DIRECTORY,normalizePublicDeals};
+module.exports={server,normalizeSovrn,parseRetailerURL,couponOffers,STORE_DIRECTORY,normalizePublicDeals,comparison};
