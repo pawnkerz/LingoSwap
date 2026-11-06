@@ -7,6 +7,15 @@ const UA = 'ScanSaveBeta/0.3 (public barcode lookup; https://scansave-beta.onren
 const cache = new Map();
 const requestLog = new Map();
 const msDay = 86400000;
+let upcLastRequest=0,upcCooldownUntil=0,upcDailyCount=0,upcDayKey='';
+function limitUPCRequests(){
+  const now=Date.now(),day=new Date(now).toISOString().slice(0,10);
+  if(day!==upcDayKey){upcDayKey=day;upcDailyCount=0;upcCooldownUntil=0}
+  if(now<upcCooldownUntil||now-upcLastRequest<11000||upcDailyCount>=90){
+    const e=new Error('UPC_SOURCE_LIMIT');e.status=429;throw e;
+  }
+  upcLastRequest=now;upcDailyCount++;
+}
 function json(res,status,data,origin){
   res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','Access-Control-Allow-Origin':origin==='https://scansave-beta.onrender.com'?ORIGIN:ORIGIN,'Vary':'Origin','X-Content-Type-Options':'nosniff'});
   res.end(JSON.stringify(data));
@@ -31,7 +40,11 @@ function cached(key,ttl,producer){
 }
 async function catalog(code){
  try{
-  const body=await cached('upc:'+code,4*3600000,()=>requestJSON('https://api.upcitemdb.com/prod/trial/lookup?upc='+encodeURIComponent(code),6500));
+  const body=await cached('upc:'+code,4*3600000,async()=>{
+   limitUPCRequests();
+   try{return await requestJSON('https://api.upcitemdb.com/prod/trial/lookup?upc='+encodeURIComponent(code),6500)}
+   catch(e){if(e.status===429)upcCooldownUntil=Date.now()+15*60000;throw e}
+  });
   const item=Array.isArray(body.items)?body.items.find(i=>[i.ean,i.upc,i.gtin].map(String).some(v=>v.replace(/^0+/,'')===code.replace(/^0+/,''))):null;
   if(!item)return {status:'not_found',product:null,offers:[]};
   const now=Date.now();
