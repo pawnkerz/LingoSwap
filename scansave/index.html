@@ -163,7 +163,7 @@ drawRecent();drawStores();
 function interpretQR(raw){
  var text=raw.trim();
  if(/^\d{8,14}$/.test(text))return text;
- try{var url=new URL(text);for(var key of ["gtin","upc","ean","barcode","product_code"]){var value=url.searchParams.get(key);if(value&&/^\d{8,14}$/.test(value))return value}}catch(e){}
+ try{var url=new URL(text);var gs1=url.pathname.match(/(?:^|\/)01\/(\d{8}|\d{12,14})(?=\/|$)/);if(gs1)return gs1[1];for(var key of ["gtin","upc","ean","barcode","product_code"]){var value=url.searchParams.get(key);if(value&&/^\d{8,14}$/.test(value))return value}}catch(e){}
  return "";
 }
 async function lookup(){
@@ -177,15 +177,34 @@ async function lookup(){
  productCode=code;var token=++renderToken;$("resultSection").classList.remove("hidden");$("productName").value="";foundName="";
  showProduct("Looking up product…","",null,code);msg("Looking up barcode in the public product database…");
  try{
-  var endpoint="https://world.openfoodfacts.org/api/v3.6/product/"+encodeURIComponent(code)+".json?fields=code,product_name,brands,image_front_small_url,quantity";
-  var response=await fetch(endpoint,{headers:{"Accept":"application/json"}});
-  if(!response.ok)throw new Error("Lookup service returned "+response.status);
-  var data=await response.json();if(token!==renderToken)return;
-  var product=data.product||null;
+  var sources=[
+   {host:"world.openfoodfacts.org",name:"Open Food Facts"},
+   {host:"world.openbeautyfacts.org",name:"Open Beauty Facts"},
+   {host:"world.openproductsfacts.org",name:"Open Products Facts"},
+   {host:"world.openpetfoodfacts.org",name:"Open Pet Food Facts"}
+  ],product=null,sourceName="";
+  for(var i=0;i<sources.length;i++){
+   var source=sources[i];
+   msg("Searching "+source.name+" for this barcode…");
+   try{
+    var endpoint="https://"+source.host+"/api/v2/product/"+encodeURIComponent(code)+".json?fields=code,product_name,brands,image_front_small_url,quantity";
+    var controller=new AbortController(),timer=setTimeout(function(){controller.abort()},5000),response,data;
+    try{
+     response=await fetch(endpoint,{headers:{"Accept":"application/json"},signal:controller.signal});
+     if(!response.ok)continue;
+     data=await response.json();
+    }finally{clearTimeout(timer)}
+    if(token!==renderToken)return;
+    if(data&&data.product&&data.status!==0&&data.product.product_name){
+     product=data.product;sourceName=source.name;break;
+    }
+   }catch(error){if(token!==renderToken)return}
+  }
+  if(token!==renderToken)return;
   foundName=product?(product.product_name||""):"";
   $("productName").value=foundName;
   showProduct(foundName||"Product not found in food database",product?(product.brands||""):"",product?(product.image_front_small_url||""):null,code);
-  msg(foundName?"Product identified. Check live offers below.":"Barcode recognized, but this item was not found in the food database. Enter its name to search.","good");
+  msg(foundName?"Product identified via "+sourceName+". Check live offers below.":"Barcode recognized, but this item was not found in the food database. Enter its name to search.","good");
   addRecent(code,foundName||code);
  }catch(error){
   if(token!==renderToken)return;
