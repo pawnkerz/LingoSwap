@@ -1,0 +1,638 @@
+[
+  {
+    "id": "walmart",
+    "name": "Walmart",
+    "domain": "walmart.com",
+    "category": "Big box"
+  },
+  {
+    "id": "target",
+    "name": "Target",
+    "domain": "target.com",
+    "category": "Big box"
+  },
+  {
+    "id": "costco",
+    "name": "Costco",
+    "domain": "costco.com",
+    "category": "Warehouse"
+  },
+  {
+    "id": "samsclub",
+    "name": "Sam's Club",
+    "domain": "samsclub.com",
+    "category": "Warehouse"
+  },
+  {
+    "id": "bjs",
+    "name": "BJ's Wholesale Club",
+    "domain": "bjs.com",
+    "category": "Warehouse"
+  },
+  {
+    "id": "meijer",
+    "name": "Meijer",
+    "domain": "meijer.com",
+    "category": "Big box"
+  },
+  {
+    "id": "fredmeyer",
+    "name": "Fred Meyer",
+    "domain": "fredmeyer.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "amazon",
+    "name": "Amazon",
+    "domain": "amazon.com",
+    "category": "Marketplace"
+  },
+  {
+    "id": "ebay",
+    "name": "eBay",
+    "domain": "ebay.com",
+    "category": "Marketplace"
+  },
+  {
+    "id": "etsy",
+    "name": "Etsy",
+    "domain": "etsy.com",
+    "category": "Marketplace"
+  },
+  {
+    "id": "kroger",
+    "name": "Kroger",
+    "domain": "kroger.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "safeway",
+    "name": "Safeway",
+    "domain": "safeway.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "albertsons",
+    "name": "Albertsons",
+    "domain": "albertsons.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "publix",
+    "name": "Publix",
+    "domain": "publix.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "aldi",
+    "name": "Aldi",
+    "domain": "aldi.us",
+    "category": "Grocery"
+  },
+  {
+    "id": "lidl",
+    "name": "Lidl",
+    "domain": "lidl.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "traderjoes",
+    "name": "Trader Joe's",
+    "domain": "traderjoes.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "wholefoodsmarket",
+    "name": "Whole Foods Market",
+    "domain": "wholefoodsmarket.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "sprouts",
+    "name": "Sprouts Farmers Market",
+    "domain": "sprouts.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "wincofoods",
+    "name": "WinCo Foods",
+    "domain": "wincofoods.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "heb",
+    "name": "H-E-B",
+    "domain": "heb.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "foodlion",
+    "name": "Food Lion",
+    "domain": "foodlion.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "giantfood",
+    "name": "Giant Food",
+    "domain": "giantfood.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "stopandshop",
+    "name": "Stop & Shop",
+    "domain": "stopandshop.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "shoprite",
+    "name": "ShopRite",
+    "domain": "shoprite.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "wegmans",
+    "name": "Wegmans",
+    "domain": "wegmans.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "harristeeter",
+    "name": "Harris Teeter",
+    "domain": "harristeeter.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "hy-vee",
+    "name": "Hy-Vee",
+    "domain": "hy-vee.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "gianteagle",
+    "name": "Giant Eagle",
+    "domain": "gianteagle.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "ralphs",
+    "name": "Ralphs",
+    "domain": "ralphs.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "vons",
+    "name": "Vons",
+    "domain": "vons.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "qfc",
+    "name": "QFC",
+    "domain": "qfc.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "frysfood",
+    "name": "Fry's Food Stores",
+    "domain": "frysfood.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "kingsoopers",
+    "name": "King Soopers",
+    "domain": "kingsoopers.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "smithsfoodanddrug",
+    "name": "Smith's Food & Drug",
+    "domain": "smithsfoodanddrug.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "dillons",
+    "name": "Dillons",
+    "domain": "dillons.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "groceryoutlet",
+    "name": "Grocery Outlet",
+    "domain": "groceryoutlet.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "savealot",
+    "name": "Save A Lot",
+    "domain": "savealot.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "weismarkets",
+    "name": "Weis Markets",
+    "domain": "weismarkets.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "hannaford",
+    "name": "Hannaford",
+    "domain": "hannaford.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "thefreshmarket",
+    "name": "The Fresh Market",
+    "domain": "thefreshmarket.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "staterbros",
+    "name": "Stater Bros.",
+    "domain": "staterbros.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "tomthumb",
+    "name": "Tom Thumb",
+    "domain": "tomthumb.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "randalls",
+    "name": "Randalls",
+    "domain": "randalls.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "marianos",
+    "name": "Mariano's",
+    "domain": "marianos.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "naturalgrocers",
+    "name": "Natural Grocers",
+    "domain": "naturalgrocers.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "foodcity",
+    "name": "Food City",
+    "domain": "foodcity.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "pigglywiggly",
+    "name": "Piggly Wiggly",
+    "domain": "pigglywiggly.com",
+    "category": "Grocery"
+  },
+  {
+    "id": "walgreens",
+    "name": "Walgreens",
+    "domain": "walgreens.com",
+    "category": "Pharmacy & beauty"
+  },
+  {
+    "id": "cvs",
+    "name": "CVS Pharmacy",
+    "domain": "cvs.com",
+    "category": "Pharmacy & beauty"
+  },
+  {
+    "id": "ulta",
+    "name": "Ulta Beauty",
+    "domain": "ulta.com",
+    "category": "Pharmacy & beauty"
+  },
+  {
+    "id": "sephora",
+    "name": "Sephora",
+    "domain": "sephora.com",
+    "category": "Pharmacy & beauty"
+  },
+  {
+    "id": "sallybeauty",
+    "name": "Sally Beauty",
+    "domain": "sallybeauty.com",
+    "category": "Pharmacy & beauty"
+  },
+  {
+    "id": "bathandbodyworks",
+    "name": "Bath & Body Works",
+    "domain": "bathandbodyworks.com",
+    "category": "Pharmacy & beauty"
+  },
+  {
+    "id": "gnc",
+    "name": "GNC",
+    "domain": "gnc.com",
+    "category": "Pharmacy & beauty"
+  },
+  {
+    "id": "vitaminshoppe",
+    "name": "The Vitamin Shoppe",
+    "domain": "vitaminshoppe.com",
+    "category": "Pharmacy & beauty"
+  },
+  {
+    "id": "homedepot",
+    "name": "The Home Depot",
+    "domain": "homedepot.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "lowes",
+    "name": "Lowe's",
+    "domain": "lowes.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "acehardware",
+    "name": "Ace Hardware",
+    "domain": "acehardware.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "menards",
+    "name": "Menards",
+    "domain": "menards.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "harborfreight",
+    "name": "Harbor Freight",
+    "domain": "harborfreight.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "tractorsupply",
+    "name": "Tractor Supply",
+    "domain": "tractorsupply.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "northerntool",
+    "name": "Northern Tool",
+    "domain": "northerntool.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "homegoods",
+    "name": "HomeGoods",
+    "domain": "homegoods.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "athome",
+    "name": "At Home",
+    "domain": "athome.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "ikea",
+    "name": "IKEA",
+    "domain": "ikea.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "wayfair",
+    "name": "Wayfair",
+    "domain": "wayfair.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "potterybarn",
+    "name": "Pottery Barn",
+    "domain": "potterybarn.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "westelm",
+    "name": "West Elm",
+    "domain": "westelm.com",
+    "category": "Home & hardware"
+  },
+  {
+    "id": "bestbuy",
+    "name": "Best Buy",
+    "domain": "bestbuy.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "apple",
+    "name": "Apple",
+    "domain": "apple.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "samsung",
+    "name": "Samsung",
+    "domain": "samsung.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "microcenter",
+    "name": "Micro Center",
+    "domain": "microcenter.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "gamestop",
+    "name": "GameStop",
+    "domain": "gamestop.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "newegg",
+    "name": "Newegg",
+    "domain": "newegg.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "bhphotovideo",
+    "name": "B&H Photo Video",
+    "domain": "bhphotovideo.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "staples",
+    "name": "Staples",
+    "domain": "staples.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "officedepot",
+    "name": "Office Depot",
+    "domain": "officedepot.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "dell",
+    "name": "Dell",
+    "domain": "dell.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "hp",
+    "name": "HP",
+    "domain": "hp.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "lenovo",
+    "name": "Lenovo",
+    "domain": "lenovo.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "microsoft",
+    "name": "Microsoft Store",
+    "domain": "microsoft.com",
+    "category": "Electronics"
+  },
+  {
+    "id": "petco",
+    "name": "Petco",
+    "domain": "petco.com",
+    "category": "Pets"
+  },
+  {
+    "id": "petsmart",
+    "name": "PetSmart",
+    "domain": "petsmart.com",
+    "category": "Pets"
+  },
+  {
+    "id": "chewy",
+    "name": "Chewy",
+    "domain": "chewy.com",
+    "category": "Pets"
+  },
+  {
+    "id": "petsuppliesplus",
+    "name": "Pet Supplies Plus",
+    "domain": "petsuppliesplus.com",
+    "category": "Pets"
+  },
+  {
+    "id": "macys",
+    "name": "Macy's",
+    "domain": "macys.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "nordstrom",
+    "name": "Nordstrom",
+    "domain": "nordstrom.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "kohls",
+    "name": "Kohl's",
+    "domain": "kohls.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "jcpenney",
+    "name": "JCPenney",
+    "domain": "jcpenney.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "tjmaxx",
+    "name": "TJ Maxx",
+    "domain": "tjmaxx.tjx.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "marshalls",
+    "name": "Marshalls",
+    "domain": "marshalls.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "rossstores",
+    "name": "Ross Dress for Less",
+    "domain": "rossstores.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "burlington",
+    "name": "Burlington",
+    "domain": "burlington.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "oldnavy",
+    "name": "Old Navy",
+    "domain": "oldnavy.gap.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "gap",
+    "name": "Gap",
+    "domain": "gap.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "hm",
+    "name": "H&M",
+    "domain": "hm.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "nike",
+    "name": "Nike",
+    "domain": "nike.com",
+    "category": "Clothing"
+  },
+  {
+    "id": "autozone",
+    "name": "AutoZone",
+    "domain": "autozone.com",
+    "category": "Auto"
+  },
+  {
+    "id": "oreillyauto",
+    "name": "O'Reilly Auto Parts",
+    "domain": "oreillyauto.com",
+    "category": "Auto"
+  },
+  {
+    "id": "advanceautoparts",
+    "name": "Advance Auto Parts",
+    "domain": "advanceautoparts.com",
+    "category": "Auto"
+  },
+  {
+    "id": "napaonline",
+    "name": "NAPA Auto Parts",
+    "domain": "napaonline.com",
+    "category": "Auto"
+  },
+  {
+    "id": "dollartree",
+    "name": "Dollar Tree",
+    "domain": "dollartree.com",
+    "category": "Discount"
+  },
+  {
+    "id": "dollargeneral",
+    "name": "Dollar General",
+    "domain": "dollargeneral.com",
+    "category": "Discount"
+  },
+  {
+    "id": "fivebelow",
+    "name": "Five Below",
+    "domain": "fivebelow.com",
+    "category": "Discount"
+  },
+  {
+    "id": "daisous",
+    "name": "Daiso",
+    "domain": "daisous.com",
+    "category": "Discount"
+  }
+]
