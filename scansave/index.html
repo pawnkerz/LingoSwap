@@ -158,7 +158,7 @@ body.app-ready .app-pages{display:block}
   <div id="couponStatus" class="coupon-status working hidden" role="status" aria-live="polite"><span id="couponStatusIcon" class="status-icon">🔎</span><div><strong id="couponStatusTitle">Checking offers</strong><p id="couponStatusMessage"></p></div></div>
   <div id="verifiedOffers" class="verified-offers" aria-live="polite"></div>
   <p class="muted">Verified promo codes apply to the provided online retailer product page, not automatically to an in-store register. No savings are recorded until you confirm an actual purchase.</p>
-  <div id="otherDealResults" class="verified-offers" aria-live="polite"></div>
+  <div id="otherDealResults" class="verified-offers" aria-live="polite"></div><div id="merchantDealResults" class="verified-offers" aria-live="polite"></div>
   <div id="offerList" class="offer-list"></div><div class="subhead">Explore selected retailers</div><div id="storeResultLinks" class="store-result-links"></div>
   <p class="muted">Search links are not verified coupons. Only enter discounts you confirmed work at the store. Automatic offer activation and price lookups require retailer or data-provider integrations.</p>
  </section>
@@ -364,6 +364,37 @@ function renderVerifiedOffers(offers){
   area.appendChild(card);
  });
 }
+
+function renderMerchantPromotions(items){
+ var container=$("merchantDealResults");container.replaceChildren();
+ if(!Array.isArray(items)||!items.length)return;
+ var heading=document.createElement("div");heading.className="subhead";heading.textContent="Additional store promotions to investigate";
+ var warning=document.createElement("p");warning.className="muted";
+ warning.textContent="These are publicly listed merchant-wide deals—not UPC-verified coupons. They may not apply to this product and are never added to your savings automatically.";
+ container.appendChild(heading);container.appendChild(warning);
+ items.slice(0,8).forEach(function(item){
+  if(!item||item.verified_for_product!==false||typeof item.title!=="string")return;
+  try{if(new URL(item.url).protocol!=="https:")return}catch(e){return}
+  var card=document.createElement("article");card.className="verified-item";
+  var title=document.createElement("strong");title.textContent=item.title.slice(0,140);
+  var store=document.createElement("div");store.className="muted";
+  store.textContent=(item.store||"Retailer")+" • Not verified for this scanned product";
+  card.appendChild(title);card.appendChild(store);
+  if(item.code){
+   var code=document.createElement("span");code.className="coupon-verification";
+   code.textContent="Possible merchant-wide code: "+String(item.code).slice(0,80);
+   card.appendChild(code);
+  }
+  if(item.expires_at){
+   var expiry=document.createElement("span");expiry.className="muted";
+   expiry.textContent="Listed expiry: "+new Date(item.expires_at).toLocaleDateString();
+   card.appendChild(expiry);
+  }
+  var link=document.createElement("a");link.href=item.url;link.target="_blank";link.rel="sponsored nofollow noopener noreferrer";
+  link.textContent="Check this promotion and its conditions ↗";card.appendChild(link);
+  container.appendChild(card);
+ });
+}
 function renderStaleCodes(candidates){
  var area=$("otherDealResults");area.replaceChildren();
  if(!Array.isArray(candidates)||!candidates.length)return;
@@ -379,11 +410,12 @@ function renderStaleCodes(candidates){
  });
 }
 async function checkCoupons(name,barcode,token){
- $("verifiedOffers").replaceChildren();$("otherDealResults").replaceChildren();
+ $("verifiedOffers").replaceChildren();$("otherDealResults").replaceChildren();$("merchantDealResults").replaceChildren();
  setCouponStatus("working","Checking available product-specific promo-code feeds…","Only provider-verified codes count as verified. Public retailer searches remain below.");
  var params=new URLSearchParams({code:barcode,q:name||barcode,store:currentStoreSelection===null||currentStoreSelection.length!==1?"all":currentStoreSelection[0]});
  var productURL=$("retailerProductURL").value.trim();
  if(productURL)params.set("product_url",productURL);
+ if(currentStoreSelection!==null&&currentStoreSelection.length>0)params.set("stores",currentStoreSelection.slice(0,106).join(","));
  try{
   var controller=new AbortController(),timer=setTimeout(function(){controller.abort()},13500),response;
   try{response=await fetch(API_BASE+"/api/offers?"+params.toString(),{signal:controller.signal,headers:{"Accept":"application/json"}})}
@@ -396,6 +428,7 @@ async function checkCoupons(name,barcode,token){
    catch(e){return false}
   }):[];
   renderStaleCodes(data.stale_candidates);
+  renderMerchantPromotions(data.related_deals);
   if(verified.length){
    renderVerifiedOffers(verified);
    setCouponStatus("found",verified.length+" verified online promo code"+(verified.length===1?"":"s")+" found",
@@ -418,7 +451,7 @@ async function checkCoupons(name,barcode,token){
   }
   if(state==="not_configured"){
    setCouponStatus("unavailable","Automatic verified coupons need provider access",
-    "ScanSave's verified promo-code connection is prepared, but the provider has not been approved/configured. Explore the retailer and manufacturer search links below.");return;
+    "Product-specific coupon verification needs provider approval. Any available public merchant promotions appear separately below and must be checked for product eligibility.");return;
   }
   if(state==="authorization_required"){
    setCouponStatus("unavailable","Coupon provider authorization required","The current provider connection cannot authenticate. No coupons were checked.");return;
