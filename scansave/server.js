@@ -89,37 +89,111 @@ async function lookup(code){
   disclaimers:['Merchant prices are reported listings, not guaranteed checkout prices.','Crowdsourced prices are dated observations, not live store shelf prices.','No automatic coupon redemption is available.'],
   providers:[{name:'UPCitemdb',status:c.status},{name:'Open Prices',status:p.status}],last_checked:new Date().toISOString()};
 }
-const SUPPORTED_HOSTS=['target.com','walmart.com','costco.com','walgreens.com','cvs.com','kroger.com','safeway.com'];
+
+/* Product-specific coupon adapter. All codes must come from an authenticated provider,
+   and only provider-verified recent codes may appear as VERIFIED. */
+const STORE_DIRECTORY=require('./stores.json');
+const SUPPORTED_HOSTS=[...new Set(STORE_DIRECTORY.map(s=>s.domain).filter(d=>/^[a-z0-9.-]+\.[a-z]{2,}$/.test(d)))];
 function parseRetailerURL(value){
- try{const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash)return null;
-  if(!SUPPORTED_HOSTS.some(h=>u.hostname===h||u.hostname.endsWith('.'+h)))return null;
+ try{
+  if(typeof value!=='string'||value.length>1800)return null;
+  const u=new URL(value);
+  if(u.protocol!=='https:'||u.username||u.password||u.port||u.hash||!u.pathname||u.pathname==='/')return null;
+  const hostname=u.hostname.toLowerCase();
+  if(!SUPPORTED_HOSTS.some(d=>hostname===d||hostname.endsWith('.'+d)))return null;
+  // Strip tracking/query data; provider docs recommend canonical stable product URLs.
   return u.origin+u.pathname;
  }catch{return null}
 }
+function validHTTPS(value){
+ try{
+  const url=new URL(value);
+  return url.protocol==='https:'&&url.hostname&&!url.username&&!url.password?url.href:null;
+ }catch{return null}
+}
+function normalizeSovrn(raw){
+ if(!raw||typeof raw!=='object'||!Array.isArray(raw.coupons)||!raw.scan||typeof raw.scan.verification_active!=='boolean'){
+  return {status:'unavailable',sources_checked:0,offers:[],provider:'Sovrn',message:'Coupon provider returned an unexpected response'};
+ }
+ const scan=raw.scan,now=Date.now();
+ const recent=[],older=[],seen=new Set();
+ for(const c of raw.coupons){
+  if(!c||typeof c!=='object'||c.verified!==true)continue;
+  const href=validHTTPS(c.affiliated_url);
+  if(!href||typeof c.code!=='string'||!c.code.trim())continue;
+  const verifiedMillis=Date.parse(c.verified_at);
+  if(!Number.isFinite(verifiedMillis)||verifiedMillis>now+msDay)continue;
+  const daysOld=Math.floor((now-verifiedMillis)/msDay);
+  const code=text(c.code,80);
+  const id=text(c.id||code,110);
+  const dedup=id+'|'+code;
+  if(seen.has(dedup))continue;seen.add(dedup);
+  const currency=c.currency==='USD'?'USD':null;
+  const before=currency?usdPrice(c.original_price):null;
+  const after=currency?usdPrice(c.price_with_code):null;
+  const difference=before!==null&&after!==null&&before>after?Math.round((before-after)*100)/100:null;
+  const row={
+   id,code,title:'Verified promo code: '+code,
+   description:text(c.code_description||'Product-specific promo code. Confirm eligibility at retailer checkout.',280),
+   url:href,provider:'Sovrn',merchant:text(raw.merchant?.group_name||raw.merchant?.domain,120),
+   currency:c.currency||null,verified:true,verified_at:new Date(verifiedMillis).toISOString(),
+   verified_days_ago:daysOld,channel:'online_promo_code',original_price:before,price_with_code:after,
+   potential_online_savings:difference,
+   requires_checkout_confirmation:true,
+   auto_redeemable:false
+  };
+  // Verification may have become stale: do not promote old codes as actively verified.
+  if(daysOld<=30)recent.push(row);
+  else older.push({...row,verified:false,stale:true,title:'Previously verified promo code: '+code});
+ }
+ recent.sort((a,b)=>((b.potential_online_savings||0)-(a.potential_online_savings||0)));
+ const pending=scan.verification_active===true;
+ const retry=Math.min(86400,Math.max(60,Number(scan.when_to_check_back)||3600));
+ return {
+  status:pending?'pending_verification':recent.length?'ok':'no_verified_offers',
+  sources_checked:pending?0:1,
+  offers:recent.slice(0,20),
+  stale_candidates:older.slice(0,10),
+  provider:'Sovrn',
+  merchant:text(raw.merchant?.group_name||raw.merchant?.domain,120),
+  verification_in_progress:pending,
+  when_to_check_back:pending?retry:null,
+  checked_at:new Date(now).toISOString(),
+  message:pending?'The provider is still testing possible codes; no complete no-offers conclusion yet.'
+    :'Coupon results apply to the supplied online product URL only. Confirm code eligibility at checkout.'
+ };
+}
 async function couponOffers(productURL){
  const key=process.env.SOVRN_SECRET_KEY,apiKey=process.env.SOVRN_SITE_API_KEY;
- if(!key||!apiKey)return {status:'not_configured',sources_checked:0,offers:[],provider:'Sovrn product promo API (approval required)'};
+ if(!key||!apiKey){
+  return {status:'not_configured',sources_checked:0,offers:[],provider:'Sovrn',
+   message:'Product-specific coupon verification requires a Sovrn-approved account and server-side keys.'};
+ }
  const url=parseRetailerURL(productURL);
- if(!url)return {status:'product_url_required',sources_checked:0,offers:[],provider:'Sovrn',message:'A canonical retailer product URL is required'};
+ if(!url){
+  return {status:'product_url_required',sources_checked:0,offers:[],provider:'Sovrn',
+   message:'Enter a canonical product page URL from one of the supported retailers.'};
+ }
  try{
   const params=new URLSearchParams({api_key:apiKey,product_url:url,include_unverified:'false'});
-  const raw=await cached('sovrn:'+url,1200000,()=>requestJSON('https://viglink.io/coupons/product?'+params,7000,{'Authorization':'secret '+key}));
-  const array=Array.isArray(raw)?raw:(Array.isArray(raw.codes)?raw.codes:Array.isArray(raw.coupons)?raw.coupons:[]);
-  const offers=array.flatMap(o=>{
-   if(!o||!(o.verified_at||o.verification_status==='verified'))return [];
-   let link;try{link=new URL(o.affiliate_url||o.url)}catch{return []}if(link.protocol!=='https:')return [];
-   return [{title:text(o.code_description||o.code||'Verified product promotion',140),description:text(o.code_description||'',300),url:link.href,code:text(o.code,70),verified:true,verified_at:o.verified_at||null,provider:'Sovrn'}];
-  });
-  if(raw.scan?.verification_active)return {status:'pending_verification',sources_checked:0,offers,provider:'Sovrn'};
-  return {status:'ok',sources_checked:1,offers,provider:'Sovrn'};
- }catch(e){return {status:'unavailable',sources_checked:0,offers:[],provider:'Sovrn'};}
+  const raw=await cached('sovrn:'+url,1200000,
+   ()=>requestJSON('https://viglink.io/coupons/product?'+params.toString(),8500,{'Authorization':'secret '+key}));
+  const result=normalizeSovrn(raw);
+  return {...result,product_url:url};
+ }catch(e){
+  return {status:e.status===401?'authorization_required':'unavailable',sources_checked:0,offers:[],
+   provider:'Sovrn',message:'Verified coupon source could not complete the request.'};
+ }
 }
+
 const server=http.createServer(async(req,res)=>{
  const host=new URL(req.url||'/', 'http://localhost');
  const origin=req.headers.origin||'';
  if(req.method==='OPTIONS'){res.writeHead(204,{'Access-Control-Allow-Origin':ORIGIN,'Access-Control-Allow-Methods':'GET,OPTIONS','Access-Control-Allow-Headers':'Content-Type','Vary':'Origin'});res.end();return}
  if(req.method!=='GET'){json(res,405,{error:'METHOD_NOT_ALLOWED'},origin);return}
- if(host.pathname==='/health'){json(res,200,{ok:true,app:'ScanSave API',coupon_provider_configured:!!(process.env.SOVRN_SECRET_KEY&&process.env.SOVRN_SITE_API_KEY),price_sources:['UPCitemdb','Open Prices']},origin);return}
+ if(host.pathname==='/health'){json(res,200,{ok:true,app:'ScanSave API',coupon_provider_configured:!!(process.env.SOVRN_SECRET_KEY&&process.env.SOVRN_SITE_API_KEY),
+ coupon_provider:'Sovrn product promo codes',coupon_source_status:(process.env.SOVRN_SECRET_KEY&&process.env.SOVRN_SITE_API_KEY)?'configured':'approval_or_keys_required',
+ supported_retailer_urls:SUPPORTED_HOSTS.length,price_sources:['UPCitemdb','Open Prices']},origin);return}
  if(!['/api/lookup','/api/offers'].includes(host.pathname)){json(res,404,{error:'NOT_FOUND'},origin);return}
  const ip=String(req.headers['x-forwarded-for']||req.socket.remoteAddress||'anonymous').split(',')[0].trim();
  const t=Date.now();let record=requestLog.get(ip)||{t,used:0};if(t-record.t>60000)record={t,used:0};record.used++;requestLog.set(ip,record);
@@ -131,4 +205,5 @@ const server=http.createServer(async(req,res)=>{
   const result=await couponOffers(host.searchParams.get('product_url')||'');json(res,200,result,origin);
  }catch(e){json(res,503,{error:'DATA_SOURCES_UNAVAILABLE'},origin)}
 });
-server.listen(PORT,'0.0.0.0',()=>console.log('ScanSave API listening on '+PORT));
+if(require.main===module){server.listen(PORT,'0.0.0.0',()=>console.log('ScanSave API listening on '+PORT))}
+module.exports={server,normalizeSovrn,parseRetailerURL,couponOffers,STORE_DIRECTORY};
