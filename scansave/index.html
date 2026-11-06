@@ -89,6 +89,17 @@ body.app-ready .app-pages{display:block}
 .receipt-checkbox input{width:18px;height:18px;flex:none;accent-color:#4d9718}
 @media(max-width:560px){.app-pages{padding:15px 11px}.bottom-nav button{font-size:10px}.bottom-nav .nav-symbol{font-size:24px}.scanner-camera video{height:min(50vh,360px)}.nav-scan-btn{font-size:11px;padding:8px 10px}}
 
+
+.verified-item{background:#f1ffe7!important;border:1px solid #b9dca5!important;padding:16px!important}
+.verified-item strong{font-size:15px}
+.coupon-savings{display:flex;align-items:center;justify-content:space-between;gap:15px;border-radius:11px;padding:12px;background:#141c10;color:#b8ff38;font-weight:950}
+.coupon-savings small{font-size:11px;color:#d3e2c8;font-weight:650}
+.coupon-code{display:flex;align-items:center;justify-content:space-between;gap:8px;border-radius:11px;background:white;border:1.5px dashed #88ba60;padding:10px;margin-top:5px}
+.coupon-code code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:16px;font-weight:950;color:#235e11;overflow-wrap:anywhere}
+.coupon-code button{background:#b8ff38;color:#17290d;border:none;border-radius:9px;padding:9px 13px;font-weight:950}
+.coupon-verification{font-size:11px;color:#55744b;font-weight:750}
+.coupon-warning{font-size:12px;color:#526c44;line-height:1.5}
+
 </style>
 </head>
 
@@ -141,11 +152,13 @@ body.app-ready .app-pages{display:block}
   <div id="addCartStatus" class="notice hidden" role="status"></div>
   <div class="field"><label class="label" for="retailer">Store for checkout (optional)</label><select id="retailer" class="input"><option value="other">Not decided yet</option></select><p class="muted">Used only to organize checkout instructions. Your search can include multiple stores.</p></div>
   <div class="subhead">Deal finder</div>
-  <div class="field"><label class="label" for="retailerProductURL">Retailer product page (optional, for verified code providers)</label><input type="url" id="retailerProductURL" class="input" placeholder="https://www.target.com/p/..." autocomplete="url"><p class="muted">Optional direct product link, never a login link. Verified coupon provider access is pending approval.</p></div>
+  <div class="field"><label class="label" for="retailerProductURL">Retailer product page (optional, for verified code providers)</label><input type="url" id="retailerProductURL" class="input" placeholder="https://www.target.com/p/..." autocomplete="url"><p class="muted">Optional direct product link, never a login link. Product-specific verification requires an approved coupon-provider account. Product URLs and coupon codes are never sent to retailers for automatic redemption.</p></div>
   <div class="actions" style="margin-bottom:10px"><button class="btn outline" id="recheckCouponBtn" type="button">RECHECK COUPON FEEDS</button></div>
   <div class="chips"><span id="storeChip" class="chip">Store</span><span class="chip">Live search shortcuts</span><span class="chip">No invented coupon codes</span></div>
   <div id="couponStatus" class="coupon-status working hidden" role="status" aria-live="polite"><span id="couponStatusIcon" class="status-icon">🔎</span><div><strong id="couponStatusTitle">Checking offers</strong><p id="couponStatusMessage"></p></div></div>
-  <div id="verifiedOffers" class="verified-offers"></div>
+  <div id="verifiedOffers" class="verified-offers" aria-live="polite"></div>
+  <p class="muted">Verified promo codes apply to the provided online retailer product page, not automatically to an in-store register. No savings are recorded until you confirm an actual purchase.</p>
+  <div id="otherDealResults" class="verified-offers" aria-live="polite"></div>
   <div id="offerList" class="offer-list"></div><div class="subhead">Explore selected retailers</div><div id="storeResultLinks" class="store-result-links"></div>
   <p class="muted">Search links are not verified coupons. Only enter discounts you confirmed work at the store. Automatic offer activation and price lookups require retailer or data-provider integrations.</p>
  </section>
@@ -303,7 +316,7 @@ function couponNotice(kind){
  $("couponOverlay").classList.remove("hidden");
  if(kind==="none"){
   $("couponDialogTitle").textContent="Sorry, no coupons were found for this product.";
-  $("couponDialogText").textContent="😔 The checked coupon sources returned no verified offers for this product. Other discounts or personalized rewards may still exist.";
+  $("couponDialogText").textContent="😔 The connected provider completed its online product URL check without a recently verified code. Other retailers, in-store promotions or rewards may still exist.";
  }else{
   $("couponDialogTitle").textContent="Sorry, we couldn't verify any coupons yet.";
   $("couponDialogText").textContent="😔 Automatic coupon feeds aren't connected or couldn't be reached. This does NOT mean no coupons exist. Check the live searches below.";
@@ -312,43 +325,112 @@ function couponNotice(kind){
 $("dismissCouponBtn").onclick=hideCouponNotice;
 $("moreSavingsBtn").onclick=function(){hideCouponNotice();$("offerList").scrollIntoView({behavior:"smooth",block:"start"})};
 $("couponOverlay").addEventListener("click",function(e){if(e.target===$("couponOverlay"))hideCouponNotice()});
+
 function renderVerifiedOffers(offers){
  var area=$("verifiedOffers");area.replaceChildren();
  offers.forEach(function(o){
-  var card=document.createElement("div");card.className="verified-item";
-  var title=document.createElement("strong");title.textContent=String(o.title||"Verified coupon").slice(0,140);
-  var detail=document.createElement("span");detail.className="muted";detail.textContent=String(o.description||"Confirm terms at the retailer.").slice(0,300);
-  var link=document.createElement("a");link.href=o.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="View retailer or coupon source ↗";
-  card.appendChild(title);card.appendChild(detail);card.appendChild(link);area.appendChild(card);
+  var card=document.createElement("article");card.className="verified-item";
+  var title=document.createElement("strong");title.textContent=String(o.title||"Verified online promo code").slice(0,140);
+  card.appendChild(title);
+  if(o.verified_at){
+   var detail=document.createElement("div");detail.className="coupon-verification";
+   detail.textContent="✅ Verified by "+String(o.provider||"provider")+" • "+new Date(o.verified_at).toLocaleDateString();
+   card.appendChild(detail);
+  }
+  if(o.code){
+   var codeBox=document.createElement("div");codeBox.className="coupon-code";
+   var code=document.createElement("code");code.textContent=String(o.code).slice(0,80);
+   var copy=document.createElement("button");copy.type="button";copy.textContent="COPY";
+   copy.onclick=function(){
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+     navigator.clipboard.writeText(String(o.code)).then(function(){copy.textContent="COPIED ✓"}).catch(function(){window.prompt("Copy this promotional code:",o.code)});
+    }else window.prompt("Copy this promotional code:",o.code);
+   };
+   codeBox.appendChild(code);codeBox.appendChild(copy);card.appendChild(codeBox);
+  }
+  var desc=document.createElement("p");desc.className="coupon-warning";desc.textContent=String(o.description||"Confirm retailer restrictions at online checkout.").slice(0,300);card.appendChild(desc);
+  if(o.currency==="USD"&&typeof o.potential_online_savings==="number"&&o.potential_online_savings>0){
+   var amount=document.createElement("div");amount.className="coupon-savings";
+   var l=document.createElement("span");l.textContent="Possible online discount";
+   var v=document.createElement("span");v.textContent=money(o.potential_online_savings);
+   amount.appendChild(l);amount.appendChild(v);card.appendChild(amount);
+   var prices=document.createElement("span");prices.className="muted";prices.textContent="Provider-listed online price: "+money(o.original_price)+" → "+money(o.price_with_code)+" (eligibility not guaranteed).";
+   card.appendChild(prices);
+  }
+  var link=document.createElement("a");link.href=o.url;link.target="_blank";
+  link.rel="sponsored nofollow noopener noreferrer";link.textContent="Open product link and check this code ↗";card.appendChild(link);
+  var note=document.createElement("div");note.className="coupon-warning";note.textContent="Online promotional code only. It is not a universal in-store barcode or a guaranteed discount.";
+  card.appendChild(note);
+  area.appendChild(card);
+ });
+}
+function renderStaleCodes(candidates){
+ var area=$("otherDealResults");area.replaceChildren();
+ if(!Array.isArray(candidates)||!candidates.length)return;
+ var header=document.createElement("p");header.className="muted";
+ header.textContent="Some codes were previously verified but have not been reverified recently. They are not counted as current offers.";
+ area.appendChild(header);
+ candidates.slice(0,5).forEach(function(o){
+  if(!o||!o.code)return;
+  var line=document.createElement("div");line.className="verified-item";
+  var t=document.createElement("strong");t.textContent=String(o.code).slice(0,80)+" — Previously verified, may be expired";
+  var meta=document.createElement("span");meta.className="muted";meta.textContent="Last verified "+(o.verified_at||"date unavailable")+". Check manually; not counted as savings.";
+  line.appendChild(t);line.appendChild(meta);area.appendChild(line);
  });
 }
 async function checkCoupons(name,barcode,token){
- $("verifiedOffers").replaceChildren();
- setCouponStatus("working","Checking product-specific coupon feeds…","Verified code providers are checked when connected; other routes appear below.");
+ $("verifiedOffers").replaceChildren();$("otherDealResults").replaceChildren();
+ setCouponStatus("working","Checking available product-specific promo-code feeds…","Only provider-verified codes count as verified. Public retailer searches remain below.");
  var params=new URLSearchParams({code:barcode,q:name||barcode,store:currentStoreSelection===null||currentStoreSelection.length!==1?"all":currentStoreSelection[0]});
  var productURL=$("retailerProductURL").value.trim();
  if(productURL)params.set("product_url",productURL);
  try{
-  var controller=new AbortController(),timer=setTimeout(function(){controller.abort()},12500),response;
+  var controller=new AbortController(),timer=setTimeout(function(){controller.abort()},13500),response;
   try{response=await fetch(API_BASE+"/api/offers?"+params.toString(),{signal:controller.signal,headers:{"Accept":"application/json"}})}
   finally{clearTimeout(timer)}
   if(token!==renderToken)return;
-  if(!response.ok)throw Error("Provider request failed");
+  if(!response.ok)throw Error("Coupon API request failed");
   var data=await response.json(),state=data.status||"unavailable";
-  var verified=Array.isArray(data.offers)?data.offers.filter(function(o){try{return o&&o.verified===true&&typeof o.title==="string"&&new URL(o.url).protocol==="https:"}catch(e){return false}}):[];
-  if(verified.length){renderVerifiedOffers(verified);setCouponStatus("found",verified.length+" verified coupon"+(verified.length===1?"":"s")+" found","Open the provider link and confirm checkout eligibility, expiration, and stacking rules.");return}
-  if(state==="ok"&&data.sources_checked>0){
-   setCouponStatus("none","No verified coupons found in "+data.sources_checked+" checked source"+(data.sources_checked===1?"":"s"),"Other coupons or personalized retailer promotions may exist.");couponNotice("none");return;
+  var verified=Array.isArray(data.offers)?data.offers.filter(function(o){
+   try{return o&&o.verified===true&&typeof o.title==="string"&&new URL(o.url).protocol==="https:"&&typeof o.verified_at==="string"}
+   catch(e){return false}
+  }):[];
+  renderStaleCodes(data.stale_candidates);
+  if(verified.length){
+   renderVerifiedOffers(verified);
+   setCouponStatus("found",verified.length+" verified online promo code"+(verified.length===1?"":"s")+" found",
+    "These apply only to the retailer product URL being checked. Verify each at online checkout; not automatically applied to your in-store shopping bag.");
+   if(state==="pending_verification")$("couponStatusMessage").textContent+=" The provider is still scanning for more codes.";
+   return;
   }
-  if(state==="product_url_required"){setCouponStatus("unavailable","Retailer product URL required","A supported retailer item URL is needed for the selected promo-code provider.");return}
-  if(state==="pending_verification"){setCouponStatus("working","Coupon verification is still in progress","The provider has not completed its verification scan; check again later.");return}
-  if(state==="not_configured"){setCouponStatus("unavailable","Verified coupon provider not connected yet","We can search retailer, manufacturer, and cashback links below. The verified coupon feed requires provider approval.");return}
-  setCouponStatus("unavailable","Unable to confirm live coupon codes","The coupon provider could not return a verified result. Additional search links remain available.");
- }catch(err){
+  if(state==="no_verified_offers"&&data.sources_checked>0){
+   setCouponStatus("none","No recently verified online promo codes for this product URL",
+    "The connected provider finished this lookup without a recently verified code. Other retailers, store discounts, or coupons may still exist.");
+   couponNotice("none");return;
+  }
+  if(state==="pending_verification"){
+   setCouponStatus("working","Still checking promo codes",
+    "The provider is verifying possible codes. Check back after "+Math.ceil((Number(data.when_to_check_back)||3600)/60)+" minute(s). No final no-coupons result is available yet.");
+   return;
+  }
+  if(state==="product_url_required"){
+   setCouponStatus("unavailable","Add a retailer product URL","To check product-specific online codes, paste an exact product page link from a supported store and select Recheck Coupon Feeds.");return;
+  }
+  if(state==="not_configured"){
+   setCouponStatus("unavailable","Automatic verified coupons need provider access",
+    "ScanSave's verified promo-code connection is prepared, but the provider has not been approved/configured. Explore the retailer and manufacturer search links below.");return;
+  }
+  if(state==="authorization_required"){
+   setCouponStatus("unavailable","Coupon provider authorization required","The current provider connection cannot authenticate. No coupons were checked.");return;
+  }
+  setCouponStatus("unavailable","Live coupon search could not be verified",
+   "The provider did not complete the lookup. This does not mean no deals exist. Use the retailer search links below.");
+ }catch(error){
   if(token!==renderToken)return;
-  setCouponStatus("unavailable","Coupon verification temporarily unavailable","We could not reach the provider. Search links below still work. No coupon claim is being made.");
+  setCouponStatus("unavailable","Coupon verification temporarily unavailable","The provider could not be reached. No coupon has been claimed or added to the savings total.");
  }
 }
+
 function offers(){
  var store=getStore(), name=$("productName").value.trim()||productCode||"product", query=encodeURIComponent(name);
  var search=store.search+query;
