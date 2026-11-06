@@ -152,7 +152,7 @@ body.app-ready .app-pages{display:block}
   <div id="addCartStatus" class="notice hidden" role="status"></div>
   <div class="field"><label class="label" for="retailer">Store for checkout (optional)</label><select id="retailer" class="input"><option value="other">Not decided yet</option></select><p class="muted">Used only to organize checkout instructions. Your search can include multiple stores.</p></div>
   <div class="subhead">Deal finder</div>
-  <div class="field"><label class="label" for="retailerProductURL">Retailer product page (optional, for verified code providers)</label><input type="url" id="retailerProductURL" class="input" placeholder="https://www.target.com/p/..." autocomplete="url"><p class="muted">Optional direct product link, never a login link. Product-specific verification requires an approved coupon-provider account. Product URLs and coupon codes are never sent to retailers for automatic redemption.</p></div>
+  <div class="field"><label class="label" for="retailerProductURL">Retailer product page (optional, for verified code providers)</label><input type="url" id="retailerProductURL" class="input" placeholder="https://www.target.com/p/..." autocomplete="url"><p class="muted">Optional direct product link, never a login link. Use the exact online product page when checking available promo codes. ScanSave never attempts checkout or uses retailer login credentials.</p></div>
   <div class="actions" style="margin-bottom:10px"><button class="btn outline" id="recheckCouponBtn" type="button">RECHECK COUPON FEEDS</button></div>
   <div class="chips"><span id="storeChip" class="chip">Store</span><span class="chip">Live search shortcuts</span><span class="chip">No invented coupon codes</span></div>
   <div id="couponStatus" class="coupon-status working hidden" role="status" aria-live="polite"><span id="couponStatusIcon" class="status-icon">🔎</span><div><strong id="couponStatusTitle">Checking offers</strong><p id="couponStatusMessage"></p></div></div>
@@ -450,8 +450,8 @@ async function checkCoupons(name,barcode,token){
    setCouponStatus("unavailable","Add a retailer product URL","To check product-specific online codes, paste an exact product page link from a supported store and select Recheck Coupon Feeds.");return;
   }
   if(state==="not_configured"){
-   setCouponStatus("unavailable","Automatic verified coupons need provider access",
-    "Product-specific coupon verification needs provider approval. Any available public merchant promotions appear separately below and must be checked for product eligibility.");return;
+   setCouponStatus("unavailable","Verified online coupon search is not available yet",
+    "You can still check the public retailer offers below. No unconfirmed coupon has been added to your savings.");return;
   }
   if(state==="authorization_required"){
    setCouponStatus("unavailable","Coupon provider authorization required","The current provider connection cannot authenticate. No coupons were checked.");return;
