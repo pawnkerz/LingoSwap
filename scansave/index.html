@@ -815,7 +815,7 @@ function safePurchase(r){
  if(a===null||b===null||b>a)return null;
  return {id:r.id.slice(0,100),date:r.date,before:a/100,after:b/100,saved:(a-b)/100,quantity:Math.min(99999,Math.max(0,Math.floor(Number(r.quantity)||0))),stores:String(r.stores||"Unspecified store").slice(0,180)};
 }
-purchases=purchases.map(safePurchase).filter(Boolean).slice(-5000);
+purchases=purchases.map(safePurchase).filter(Boolean);
 function purchaseDate(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function sumPurchases(rows){return rows.reduce(function(t,p){t.a+=cents(p.before)||0;t.b+=cents(p.after)||0;t.n++;return t},{a:0,b:0,n:0})}
 var savingsCard=document.createElement("section");savingsCard.className="card lifetime-card";savingsCard.id="savingsHistory";
@@ -876,7 +876,9 @@ $("saveTripBtn").onclick=function(){
  var date=purchaseDate(),id=date+"-"+Date.now()+"-"+Math.random().toString(36).slice(2,10);
  var item=safePurchase({id,date,before:t.before/100,after:after/100,quantity:t.qty,stores:[...t.names].join(", ")});
  if(!item){errorRecord("Could not validate this checkout.");return}
- purchases.push(item);purchases=purchases.slice(-5000);storeSave(PURCHASE_KEY,purchases);
+ purchases.push(item);
+ try{localStorage.setItem(PURCHASE_KEY,JSON.stringify(purchases))}
+ catch(error){purchases.pop();errorRecord("This device could not save the purchase history. Back up your existing history or free browser storage, then try again. Your shopping bag was not cleared.");return}
  bag=[];storeSave("ss-cart-v2",bag);renderBag();recordCard.classList.add("hidden");$("checkoutPanel").classList.add("hidden");
  renderHistory();showPage("savings");feedbackHistory("Purchase saved. You saved "+money(item.saved)+" at checkout. Yearly and lifetime totals updated.",false);
 };
@@ -894,9 +896,11 @@ $("importHistoryFile").onchange=async function(){
   if(file.size>1500000)throw Error("oversize");
   var data=JSON.parse(await file.text());
   if(data.schema!=="ScanSave-purchases-v1"||!Array.isArray(data.purchases))throw Error("format");
-  var seen=new Set(purchases.map(function(p){return p.id})),added=0;
-  data.purchases.slice(0,5000).map(safePurchase).filter(Boolean).forEach(function(p){if(!seen.has(p.id)){purchases.push(p);seen.add(p.id);added++}});
-  purchases=purchases.slice(-5000);storeSave(PURCHASE_KEY,purchases);renderHistory();
+  var previousRecords=purchases.slice(),seen=new Set(purchases.map(function(p){return p.id})),added=0;
+  data.purchases.slice(0,20000).map(safePurchase).filter(Boolean).forEach(function(p){if(!seen.has(p.id)){purchases.push(p);seen.add(p.id);added++}});
+  try{localStorage.setItem(PURCHASE_KEY,JSON.stringify(purchases))}
+  catch(error){purchases=previousRecords;feedbackHistory("Device storage is full. Nothing was imported; back up or free storage and try again.",true);return}
+  renderHistory();
   feedbackHistory(added+" purchase record"+(added===1?"":"s")+" restored; duplicates skipped.",false);
  }catch(e){feedbackHistory("Could not restore: choose a valid ScanSave savings backup.",true)}finally{this.value=""}
 };
