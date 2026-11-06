@@ -1,7 +1,7 @@
 'use strict';
 const { test }=require('node:test');
 const assert=require('node:assert/strict');
-const { normalizeSovrn,parseRetailerURL,couponOffers,STORE_DIRECTORY }=require('./server');
+const { normalizeSovrn,parseRetailerURL,couponOffers,STORE_DIRECTORY,normalizePublicDeals }=require('./server');
 const now=Date.now();
 const recent=new Date(now-2*86400000).toISOString();
 const old=new Date(now-50*86400000).toISOString();
@@ -66,4 +66,33 @@ test('not configured means no sources checked',async()=>{
  try{const r=await couponOffers('https://www.target.com/p/item');assert.equal(r.status,'not_configured');assert.equal(r.sources_checked,0)}
  finally{if(key===undefined)delete process.env.SOVRN_SECRET_KEY;else process.env.SOVRN_SECRET_KEY=key;
  if(api===undefined)delete process.env.SOVRN_SITE_API_KEY;else process.env.SOVRN_SITE_API_KEY=api}
+});
+
+test('public merchant deals remain clearly unverified for specific products',()=>{
+ const fixture={results:[
+  {id:1,title:'Nutella 20% off at Target',merchant:{name:'Target'},code:'NUTELLA20',url:'/deals/1',valid_until:new Date(Date.now()+7*86400000).toISOString()},
+  {id:2,title:'Vacuum cleaner promotion',merchant:{name:'Walmart'},url:'/deals/2'}
+ ]};
+ const r=normalizePublicDeals(fixture,'Nutella',[]);
+ assert.equal(r.status,'ok');assert.equal(r.offers.length,1);
+ assert.equal(r.offers[0].verified_for_product,false);
+ assert.equal(r.offers[0].auto_redeemable,false);
+ assert.equal(r.offers[0].url,'https://partners.clickwise.net/deals/1');
+});
+test('expired merchant promotion is excluded',()=>{
+ const fixture={results:[{id:3,title:'Nutella promo',merchant:{name:'Target'},code:'EXPIRED',
+  url:'/deals/3',valid_until:new Date(Date.now()-86400000).toISOString()}]};
+ const r=normalizePublicDeals(fixture,'Nutella',[]);
+ assert.equal(r.offers.length,0);
+});
+test('selecting a retailer finds that store only, never a product verification claim',()=>{
+ const fixture={results:[
+  {id:1,title:'Sitewide Target promotions',merchant:{name:'Target'},url:'/deals/1'},
+  {id:2,title:'Sitewide Walmart promotions',merchant:{name:'Walmart'},url:'/deals/2'}
+ ]};
+ const target=STORE_DIRECTORY.find(s=>s.id==='target');
+ const r=normalizePublicDeals(fixture,'Nutella',[target]);
+ assert.equal(r.offers.length,1);
+ assert.equal(r.offers[0].store,'Target');
+ assert.equal(r.offers[0].verified_for_product,false);
 });
