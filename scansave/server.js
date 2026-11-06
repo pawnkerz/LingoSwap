@@ -186,6 +186,54 @@ async function couponOffers(productURL){
  }
 }
 
+
+/* No-key deal discovery. This public feed contains merchant-wide promotions, NOT
+   UPC-matched coupons, and is always kept separate from verified product codes. */
+function cleanName(value){return String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,'')}
+function merchantForDeal(raw){
+ const name=text(raw.merchant?.name||raw.merchant_name||raw.program?.name||raw.program_name||raw.brand||'',100);
+ const label=cleanName(name);
+ return STORE_DIRECTORY.find(s=>cleanName(s.name)===label||cleanName(s.domain)===label)||null;
+}
+function normalizePublicDeals(raw,productName,selectedStores){
+ if(!raw||!Array.isArray(raw.results))return {status:'unavailable',offers:[]};
+ const now=Date.now(),wanted=new Set((selectedStores||[]).filter(s=>SUPPORTED_HOSTS.includes(s.domain)).map(s=>s.id));
+ const all=!wanted.size,queryWords=text(productName,150).toLowerCase().split(/[^a-z0-9]+/).filter(w=>w.length>4);
+ const output=[];
+ for(const item of raw.results.slice(0,150)){
+  if(!item||typeof item.title!=='string')continue;
+  const store=merchantForDeal(item);
+  if(!store)continue;
+  if(!all&&!wanted.has(store.id))continue;
+  // With all stores selected, show only title matches instead of unrelated merchant ads.
+  if(all&&(!queryWords.length||!queryWords.some(w=>item.title.toLowerCase().includes(w))))continue;
+  const expiry=Date.parse(item.valid_until||'');
+  if(Number.isFinite(expiry)&&expiry<now)continue;
+  let url;
+  try{
+   url=new URL(item.url||'', 'https://partners.clickwise.net');
+   if(url.protocol!=='https:'||url.hostname!=='partners.clickwise.net')continue;
+  }catch{continue}
+  output.push({
+   id:text(item.id,80),store:store.name,title:text(item.title,150),description:text(item.description||'',250),
+   code:text(item.code||'',70),url:url.href,expires_at:Number.isFinite(expiry)?new Date(expiry).toISOString():null,
+   provider:'Clickwise public deals',verified_for_product:false,
+   kind:'merchant_wide_candidate',
+   disclosure:'Merchant promotion only. Product eligibility and checkout redemption are not verified.',
+   auto_redeemable:false
+  });
+  if(output.length>=10)break;
+ }
+ return {status:'ok',offers:output};
+}
+async function discoverPublicDeals(productName,selection){
+ try{
+  const raw=await cached('clickwise:public:en',10*60000,()=>requestJSON('https://partners.clickwise.net/api/v1/deals/?lang=en&page_size=50',6500));
+  const selected=String(selection||'all')==='all'?[]:String(selection).split(',').map(id=>STORE_DIRECTORY.find(s=>s.id===id)).filter(Boolean);
+  return normalizePublicDeals(raw,productName,selected);
+ }catch(e){return {status:'unavailable',offers:[]}}
+}
+
 const server=http.createServer(async(req,res)=>{
  const host=new URL(req.url||'/', 'http://localhost');
  const origin=req.headers.origin||'';
@@ -202,8 +250,8 @@ const server=http.createServer(async(req,res)=>{
  try{
   if(host.pathname==='/api/lookup'){const code=host.searchParams.get('code')||'';if(!codeOK(code)){json(res,400,{error:'INVALID_BARCODE'},origin);return}
    const data=await lookup(code);json(res,200,data,origin);return}
-  const result=await couponOffers(host.searchParams.get('product_url')||'');json(res,200,result,origin);
+  const [result,other]=await Promise.all([couponOffers(host.searchParams.get('product_url')||''),discoverPublicDeals(host.searchParams.get('q')||'',host.searchParams.get('stores')||host.searchParams.get('store')||'all')]);json(res,200,{...result,related_deals:other.offers,related_deal_feed_status:other.status},origin);
  }catch(e){json(res,503,{error:'DATA_SOURCES_UNAVAILABLE'},origin)}
 });
 if(require.main===module){server.listen(PORT,'0.0.0.0',()=>console.log('ScanSave API listening on '+PORT))}
-module.exports={server,normalizeSovrn,parseRetailerURL,couponOffers,STORE_DIRECTORY};
+module.exports={server,normalizeSovrn,parseRetailerURL,couponOffers,STORE_DIRECTORY,normalizePublicDeals};
