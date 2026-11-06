@@ -39,13 +39,63 @@
 .store-result-link span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:560px){.store-options{grid-template-columns:1fr}.store-search-row,.store-result-links{grid-template-columns:1fr}}
 
+
+body.app-ready{padding-bottom:100px;background:#f6faf2}
+body.app-ready main.shell,body.app-ready section.hero{display:none!important}
+.app-pages{display:none;max-width:850px;margin:auto;padding:20px 15px}
+body.app-ready .app-pages{display:block}
+.app-page{display:none}.app-page.active{display:block}.app-pages .card{margin-bottom:17px}
+.page-intro{padding:8px 3px 18px}.page-intro h1{margin:5px 0;font-size:clamp(32px,6vw,52px);line-height:1.05;letter-spacing:-.055em;font-weight:950}
+.page-intro h1 em{font-style:normal;color:#4a9418}.page-intro p{font-size:14px;line-height:1.55;color:#576a4e;margin:8px 0}
+.page-intro .eyebrow{background:#eaffd5;color:#306220}
+.bottom-nav{display:none}body.app-ready .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:90;background:#0c100a;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;padding:8px max(env(safe-area-inset-right),6px) calc(9px + env(safe-area-inset-bottom)) max(env(safe-area-inset-left),6px);box-shadow:0 -5px 25px #11201533}
+.bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:52px;border:0;border-radius:11px;background:transparent;color:#afc6a3;font-size:11px;font-weight:850}
+.bottom-nav button.active{color:#b8ff38;background:#273d16}.nav-symbol{font-size:26px;font-weight:900;line-height:1.05}
+.nav-scan-btn{background:#b8ff38;color:#111f0a;border:0;border-radius:30px;padding:10px 13px;font-size:12px;font-weight:950;white-space:nowrap}
+.scanner-camera{position:relative;border-radius:17px;overflow:hidden;background:#060b03}
+.scanner-camera video{display:block;width:100%;height:min(55vh,420px);object-fit:cover;border-radius:17px;border:2px solid #b8ff38}
+.scanner-frame{position:absolute;inset:17% 10%;pointer-events:none}
+.scanner-corner{position:absolute;width:35px;height:35px;border-color:#b8ff38;border-style:solid;border-width:0;filter:drop-shadow(0 0 5px #b8ff3866)}
+.scanner-corner.top-left{top:0;left:0;border-top-width:4px;border-left-width:4px}
+.scanner-corner.top-right{top:0;right:0;border-top-width:4px;border-right-width:4px}
+.scanner-corner.bottom-left{bottom:0;left:0;border-bottom-width:4px;border-left-width:4px}
+.scanner-corner.bottom-right{bottom:0;right:0;border-bottom-width:4px;border-right-width:4px}
+.scanner-laser{position:absolute;left:4%;right:4%;top:3%;height:3px;background:#b8ff38;box-shadow:0 0 9px 3px #b8ff3866;border-radius:999px;animation:scannerSweep 2.1s ease-in-out infinite alternate}
+@keyframes scannerSweep{0%{top:4%}100%{top:95%}}@media(prefers-reduced-motion:reduce){.scanner-laser{animation:none;top:50%}}
+.scan-modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}
+.scan-modes button{padding:10px;border-radius:10px;border:1px solid #739864;background:#25351d;color:#e0ebd8;font-size:13px;font-weight:850}
+.scan-modes button.active{color:#132309;background:#b8ff38;border-color:#b8ff38}
+.manual-scan{width:100%;border:1px solid #769769!important;color:#eaffdd!important;background:transparent!important;margin-top:8px}
+.lifetime-card .history-hero{background:#10160e;color:#fff;padding:22px;border-radius:16px;display:grid;gap:9px}
+.history-hero .eyeline{font-size:11px;font-weight:900;color:#d7e3d0;letter-spacing:.055em}
+.history-hero .money{font-size:clamp(38px,8vw,60px);font-weight:950;color:#b8ff38;letter-spacing:-.06em}
+.history-hero small{font-size:12px;color:#bbccb3}
+.history-metrics{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin:12px 0}
+.history-metric{background:#ebffdc;border:1px solid #c9e8b4;border-radius:13px;padding:15px;display:grid;gap:8px}
+.history-metric span{font-size:11px;color:#41692c;font-weight:850}.history-metric strong{font-size:clamp(23px,5vw,31px);color:#255e14;font-weight:950;letter-spacing:-.04em}
+.history-section-title{font-size:12px;color:#356720;font-weight:950;letter-spacing:.06em;margin-top:16px;padding-bottom:6px;border-bottom:1px solid #d9e6d0}
+.history-row{display:flex;justify-content:space-between;gap:15px;padding:8px 0;font-size:13px}
+.history-row strong{font-size:15px}
+.history-entry{border:1px solid #dce8d3;border-radius:12px;padding:13px;margin:8px 0;background:#fbfff9}
+.history-entry-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.history-entry .saved{font-weight:950;font-size:19px;color:#287515}
+.history-entry p{font-size:12px;color:#64765c;line-height:1.5;margin:6px 0}
+.history-entry button{font-size:11px;background:white;border:1px solid #d7e4cd;padding:6px;border-radius:7px;color:#596f4e}
+.history-actions{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
+.history-import{padding:10px 12px;border-radius:10px;border:1px solid #b8d7a4;font-weight:850;color:#255e14;font-size:12px;cursor:pointer}
+.hidden-input{position:absolute!important;width:1px;height:1px;opacity:0;pointer-events:none}
+.checkout-confirm{border:2px solid #b8ff38}
+.checkout-confirm label.receipt-checkbox{display:flex;gap:10px;align-items:flex-start;background:#edffe1;padding:12px;border-radius:12px;font-size:13px;margin:12px 0;line-height:1.5}
+.receipt-checkbox input{width:18px;height:18px;flex:none;accent-color:#4d9718}
+@media(max-width:560px){.app-pages{padding:15px 11px}.bottom-nav button{font-size:10px}.bottom-nav .nav-symbol{font-size:24px}.scanner-camera video{height:min(50vh,360px)}.nav-scan-btn{font-size:11px;padding:8px 10px}}
+
 </style>
 </head>
 
 <body>
 <header class="top"><div class="top-inner">
   <div class="brand"><div class="brand-icon">⌗</div> Scan<span>Save</span></div>
-  <div class="top-actions"><span class="beta">FREE • NO SIGN-UP</span><a href="#scanner">SCAN PRODUCT</a><a href="#basket" class="cart-pill">🛒 <span id="cartCountTop">0</span> ITEMS</a></div>
+  <div class="top-actions"><span class="beta">FREE • NO SIGN-UP</span><button type="button" id="headerScanBtn" class="nav-scan-btn">▣ SCAN PRODUCT</button><a href="#basket" class="cart-pill">🛒 <span id="cartCountTop">0</span> ITEMS</a></div>
 </div></header>
 <section class="hero"><div class="hero-inner"><span class="eyebrow">⚡ THE SMARTER WAY TO SHOP</span>
 <h1>SCAN IT.<br><em>SAVE MORE.</em></h1>
@@ -125,11 +175,13 @@
  <p class="muted">Manufacturer coupons, retailer discounts, and rewards can have separate eligibility and stacking rules. Some rebates credit after purchase.</p>
 </section>
 </div></div></main>
+<main id="appPages" class="app-pages" aria-label="ScanSave application"></main>
+<nav id="bottomNav" class="bottom-nav" aria-label="Primary navigation"><button type="button" id="navScan" data-page="scan" aria-current="page"><span class="nav-symbol">▣</span><span>Scan</span></button><button type="button" id="navDeals" data-page="deals"><span class="nav-symbol">⌕</span><span>Deals</span></button><button type="button" id="navStores" data-page="stores"><span class="nav-symbol">▤</span><span>Stores</span></button><button type="button" id="navSavings" data-page="savings"><span class="nav-symbol">↗</span><span>Savings</span></button><button type="button" id="navWallet" data-page="wallet"><span class="nav-symbol">▱</span><span>Wallet</span></button></nav>
 <div id="couponOverlay" class="coupon-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="couponDialogTitle" aria-describedby="couponDialogText">
  <div class="coupon-dialog"><div class="sad">😔</div><h2 id="couponDialogTitle">Sorry, no verified coupons found.</h2><p id="couponDialogText">No qualifying offer was found in the sources checked. Other savings may still exist.</p>
  <div class="actions"><button id="moreSavingsBtn" class="btn" type="button">KEEP LOOKING</button><button id="dismissCouponBtn" class="btn secondary" type="button">CLOSE</button></div></div>
 </div>
-<div id="scannerOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Product scanner"><div class="scanner"><div class="scanner-head"><h2 id="scannerTitle">Scan product code</h2><button id="closeScanner" type="button">Close ✕</button></div><video id="video" playsinline autoplay muted></video><p id="scannerHelp">Allow camera access and aim at your product's barcode.</p></div></div>
+<div id="scannerOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Product scanner"><div class="scanner"><div class="scanner-head"><h2 id="scannerTitle">Scan product code</h2><button id="closeScanner" type="button">Close ✕</button></div><div class="scanner-camera"><video id="video" playsinline autoplay muted></video><div class="scanner-frame" aria-hidden="true"><span class="scanner-corner top-left"></span><span class="scanner-corner top-right"></span><span class="scanner-corner bottom-left"></span><span class="scanner-corner bottom-right"></span><span class="scanner-laser"></span></div></div><div class="scan-modes"><button id="liveBarcodeMode" class="active" type="button">▥ BARCODE</button><button id="liveQrMode" type="button">▦ QR CODE</button></div><p id="scannerHelp">Align a product barcode inside the neon scanning frame.</p><button id="manualScanBtn" type="button" class="manual-scan">ENTER CODE MANUALLY</button></div></div>
 <footer class="foot">ScanSave Beta • No automatic retailer integrations yet • Discounts must be verified at checkout • Not affiliated with named retailers.<br>Product information: Open Food Facts/Open Facts projects. Price observations: <a href="https://prices.openfoodfacts.org/" target="_blank" rel="noopener noreferrer">Open Prices</a> contributors (<a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener noreferrer">ODbL</a>). No retailer passwords collected.</footer>
 
 <script>
@@ -357,7 +409,7 @@ async function lookup(){
   else{msg("This does not look like an 8–14 digit UPC/EAN product barcode.","error")}
   return;
  }
- productCode=code;["shelfPrice","instantDiscount","futureReward","taxAmount"].forEach(function(id){$(id).value=""});$("qty").value="1";calculation();var token=++renderToken;loadMarketData(code,token);$("resultSection").classList.remove("hidden");$("productName").value="";foundName="";
+ productCode=code;["shelfPrice","instantDiscount","futureReward","taxAmount"].forEach(function(id){$(id).value=""});$("qty").value="1";calculation();var token=++renderToken;loadMarketData(code,token);$("resultSection").classList.remove("hidden");showPage("deals");$("productName").value="";foundName="";
  showProduct("Looking up product…","",null,code);msg("Looking up barcode in the public product database…");
  try{
   var sources=[
@@ -674,6 +726,184 @@ checkoutStoreInfo=function(id){
  if(!s)return originalCheckoutStoreInfo("other");
  return {name:s.name,link:"https://"+s.domain+"/",action:"Open official "+s.name+" website"};
 };
+
+
+/* Five independent app screens: Scan / Deals / Stores / Savings / Wallet */
+var appPageMap={};
+var APP_PAGES=[
+ ["scan","Scan products","Point your camera at a UPC barcode or QR code to identify a product."],
+ ["deals","Deals & prices","Compare reported prices and search options. Verify offers before checkout."],
+ ["stores","Your stores","Search 106 stores, compare all stores, or select specific retailers."],
+ ["savings","Lifetime savings","What you would have spent, what you actually paid, and how much you kept."],
+ ["wallet","Checkout wallet","Your current shopping bag, retailer redemption help, and purchase confirmation."]
+];
+var appPagesRoot=$("appPages");
+function makePage(key,title,description){
+ var section=document.createElement("section");section.className="app-page";section.id="appPage-"+key;section.setAttribute("aria-label",title);
+ var header=document.createElement("div");header.className="page-intro";
+ var eyebrow=document.createElement("span");eyebrow.className="eyebrow";eyebrow.textContent="SCANSAVE • "+key.toUpperCase();
+ var h=document.createElement("h1");h.textContent=title;
+ var p=document.createElement("p");p.textContent=description;
+ header.appendChild(eyebrow);header.appendChild(h);header.appendChild(p);section.appendChild(header);
+ appPagesRoot.appendChild(section);appPageMap[key]=section;return section;
+}
+APP_PAGES.forEach(function(row){makePage(row[0],row[1],row[2])});
+var scanPage=appPageMap.scan,dealPage=appPageMap.deals,storesPage=appPageMap.stores,walletPage=appPageMap.wallet,savingsPage=appPageMap.savings;
+var oldRecentCard=document.querySelector(".workspace > section.card:last-child");
+scanPage.appendChild($("scanner"));
+if(oldRecentCard)scanPage.appendChild(oldRecentCard);
+var storePick=$("storePicker");
+if(storePick){storesPage.appendChild(storePick)}
+storesPage.appendChild($("accounts"));
+dealPage.appendChild($("resultSection"));
+walletPage.appendChild($("basket"));
+walletPage.appendChild($("checkoutPanel"));
+var scanTip=document.createElement("div");scanTip.className="card";
+scanTip.innerHTML='<strong>Scan the next product</strong><p class="muted">Use the camera button below or the Scan tab. The scanner opens directly.</p><button id="scanNextBtn" class="btn" type="button">▣ SCAN ANOTHER PRODUCT</button>';
+dealPage.appendChild(scanTip);
+var dealEmpty=document.createElement("div");dealEmpty.id="emptyDeals";dealEmpty.className="card";
+dealEmpty.innerHTML='<h2>No product scanned yet</h2><p class="muted">Open the camera and scan a barcode to search for discounts and reported prices.</p><button id="scanFromDealsBtn" class="btn" type="button">OPEN SCANNER</button>';
+dealPage.insertBefore(dealEmpty,dealPage.children[1]);
+var appCurrentPage="scan";
+function showPage(name){
+ var section=appPageMap[name]||scanPage;
+ appCurrentPage=name in appPageMap?name:"scan";
+ Object.keys(appPageMap).forEach(function(key){appPageMap[key].classList.toggle("active",key===appCurrentPage)});
+ ["scan","deals","stores","savings","wallet"].forEach(function(key){
+  var b=$("nav"+key.charAt(0).toUpperCase()+key.slice(1));
+  b.classList.toggle("active",key===appCurrentPage);
+  if(key===appCurrentPage)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");
+ });
+ $("emptyDeals").classList.toggle("hidden",!$("resultSection").classList.contains("hidden"));
+ window.scrollTo(0,0);
+}
+function openLiveScanner(){
+ showPage("scan");
+ startScanner();
+}
+$("navScan").onclick=openLiveScanner;
+$("navDeals").onclick=function(){stopScanner();showPage("deals")};
+$("navStores").onclick=function(){stopScanner();showPage("stores")};
+$("navSavings").onclick=function(){stopScanner();renderHistory();showPage("savings")};
+$("navWallet").onclick=function(){stopScanner();showPage("wallet")};
+$("headerScanBtn").onclick=openLiveScanner;
+$("scanNextBtn").onclick=openLiveScanner;
+$("scanFromDealsBtn").onclick=openLiveScanner;
+$("cameraBtn").onclick=openLiveScanner;
+$("manualScanBtn").onclick=function(){stopScanner();showPage("scan");$("code").focus()};
+function syncLiveMode(){
+ $("liveBarcodeMode").classList.toggle("active",mode==="barcode");
+ $("liveQrMode").classList.toggle("active",mode==="qr");
+ $("scannerHelp").textContent=mode==="barcode"?"Position the entire retail barcode in the scanning frame.":"Center a QR code inside the frame.";
+}
+$("liveBarcodeMode").onclick=function(){stopScanner();changeMode("barcode");syncLiveMode();startScanner()};
+$("liveQrMode").onclick=function(){stopScanner();changeMode("qr");syncLiveMode();startScanner()};
+var barcodeModeButton=$("barcodeMode"),qrModeButton=$("qrMode");
+barcodeModeButton.addEventListener("click",syncLiveMode);
+qrModeButton.addEventListener("click",syncLiveMode);
+syncLiveMode();
+
+/* On-device ledger for completed receipt-confirmed shopping, not estimates. */
+var PURCHASE_KEY="ss-purchases-v1";
+var purchases=storeState(PURCHASE_KEY,[]);
+if(!Array.isArray(purchases))purchases=[];
+function cents(value){var x=Number(value);return Number.isFinite(x)&&x>=0&&x<=100000000?Math.round(x*100):null}
+function safePurchase(r){
+ if(!r||typeof r!=="object"||typeof r.id!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(r.date||""))return null;
+ var a=cents(r.before),b=cents(r.after);
+ if(a===null||b===null||b>a)return null;
+ return {id:r.id.slice(0,100),date:r.date,before:a/100,after:b/100,saved:(a-b)/100,quantity:Math.min(99999,Math.max(0,Math.floor(Number(r.quantity)||0))),stores:String(r.stores||"Unspecified store").slice(0,180)};
+}
+purchases=purchases.map(safePurchase).filter(Boolean).slice(-5000);
+function purchaseDate(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function sumPurchases(rows){return rows.reduce(function(t,p){t.a+=cents(p.before)||0;t.b+=cents(p.after)||0;t.n++;return t},{a:0,b:0,n:0})}
+var savingsCard=document.createElement("section");savingsCard.className="card lifetime-card";savingsCard.id="savingsHistory";
+savingsCard.innerHTML="<div class=\"lead\"><h2>Actual savings</h2><span class=\"step\">YOUR RECORD</span></div>\n<div class=\"history-hero\"><span class=\"eyeline\">TOTAL SAVED AT CHECKOUT · ALL TIME</span><div class=\"money\" id=\"allTimeSaved\">$0.00</div><small>Recorded completed purchases on this device.</small></div>\n<div class=\"history-metrics\"><div class=\"history-metric\"><span>THIS YEAR <span id=\"historyYear\"></span></span><strong id=\"yearSaved\">$0.00</strong></div><div class=\"history-metric\"><span>SHOPPING SESSIONS</span><strong id=\"lifetimeTrips\">0</strong></div></div>\n<div class=\"history-section-title\">THIS YEAR</div>\n<div class=\"history-row\"><span>Without discounts</span><strong id=\"yearBefore\">$0.00</strong></div>\n<div class=\"history-row\"><span>Actually paid</span><strong id=\"yearAfter\">$0.00</strong></div>\n<div class=\"history-row\"><span>Saved at checkout</span><strong id=\"yearSavedDetail\">$0.00</strong></div>\n<div class=\"history-section-title\">ALL TIME</div>\n<div class=\"history-row\"><span>Without discounts</span><strong id=\"allTimeBefore\">$0.00</strong></div>\n<div class=\"history-row\"><span>Actually paid</span><strong id=\"allTimeAfter\">$0.00</strong></div>\n<div class=\"history-row\"><span>Saved at checkout</span><strong id=\"allTimeSavedDetail\">$0.00</strong></div>\n<div class=\"history-section-title\">COMPLETED SESSIONS <span id=\"historyTripCount\"></span></div><div id=\"tripHistoryList\"></div>\n<div class=\"history-actions\"><button id=\"exportHistoryBtn\" class=\"btn outline small\" type=\"button\">↓ BACK UP HISTORY</button><label for=\"importHistoryFile\" class=\"history-import\">RESTORE BACKUP</label><input id=\"importHistoryFile\" type=\"file\" class=\"hidden-input\" accept=\".json,application/json\"></div>\n<div id=\"historyFeedback\" class=\"notice hidden\" role=\"status\"></div>\n<p class=\"muted\">Your history is kept on this browser without an account. Back it up to preserve totals when changing phones. Only receipt-confirmed discounts count; potential coupons and future rewards do not.</p>";savingsPage.appendChild(savingsCard);
+function feedbackHistory(message,error){var el=$("historyFeedback");el.className="notice"+(error?" error":" good");el.textContent=message}
+function renderHistory(){
+ var year=String(new Date().getFullYear()),total=sumPurchases(purchases),current=sumPurchases(purchases.filter(function(p){return p.date.startsWith(year+"-")}));
+ $("historyYear").textContent=year;
+ $("allTimeSaved").textContent=money((total.a-total.b)/100);
+ $("yearSaved").textContent=money((current.a-current.b)/100);
+ $("lifetimeTrips").textContent=String(total.n);
+ $("yearBefore").textContent=money(current.a/100);$("yearAfter").textContent=money(current.b/100);
+ $("yearSavedDetail").textContent=money((current.a-current.b)/100);
+ $("allTimeBefore").textContent=money(total.a/100);$("allTimeAfter").textContent=money(total.b/100);
+ $("allTimeSavedDetail").textContent=money((total.a-total.b)/100);
+ $("historyTripCount").textContent="("+total.n+")";
+ var root=$("tripHistoryList");root.replaceChildren();
+ if(!total.n){var none=document.createElement("p");none.className="muted";none.textContent="No purchases recorded yet. Use Wallet → Complete Purchase after checkout.";root.appendChild(none);return}
+ purchases.slice().reverse().slice(0,60).forEach(function(p){
+  var card=document.createElement("div");card.className="history-entry";
+  var line=document.createElement("div");line.className="history-entry-top";
+  var label=document.createElement("strong");label.textContent=p.date;
+  var saved=document.createElement("span");saved.className="saved";saved.textContent="+"+money(p.saved)+" saved";
+  line.appendChild(label);line.appendChild(saved);card.appendChild(line);
+  var meta=document.createElement("p");meta.textContent=p.stores+" • "+p.quantity+" item(s) • Regular: "+money(p.before)+" • Paid: "+money(p.after);card.appendChild(meta);
+  var remove=document.createElement("button");remove.type="button";remove.textContent="Remove record";
+  remove.onclick=function(){if(!window.confirm("Delete this purchase from local savings history?"))return;purchases=purchases.filter(function(r){return r.id!==p.id});storeSave(PURCHASE_KEY,purchases);renderHistory();feedbackHistory("Removed purchase record.",false)};
+  card.appendChild(remove);root.appendChild(card);
+ });
+ if(purchases.length>60){var hint=document.createElement("p");hint.className="muted";hint.textContent="Newest 60 shown. All "+purchases.length+" contribute to your totals.";root.appendChild(hint)}
+}
+var recordCard=document.createElement("section");recordCard.className="card checkout-confirm hidden";recordCard.id="recordTripPanel";
+recordCard.innerHTML="<div class=\"lead\"><h2>Record completed purchase</h2><span class=\"step\">CONFIRM</span></div>\n<p class=\"muted\">Compare your completed checkout receipt with the original prices. Enter the final merchandise subtotal after discounts, excluding tax, fees and unused rewards.</p>\n<div class=\"history-row\"><span>Without discounts</span><strong id=\"recordBefore\">$0.00</strong></div>\n<div class=\"history-row\"><span>Estimated after discounts</span><strong id=\"recordEstimate\">$0.00</strong></div>\n<div class=\"field\" style=\"margin-top:13px\"><label for=\"actualSubtotal\" class=\"label\">Actual merchandise subtotal paid before tax ($)</label><input id=\"actualSubtotal\" class=\"input\" type=\"number\" min=\"0\" step=\".01\" inputmode=\"decimal\" placeholder=\"Subtotal on receipt\"></div>\n<label class=\"receipt-checkbox\"><input id=\"receiptConfirmed\" type=\"checkbox\"><span>I completed the purchase and verified the amount against my receipt.</span></label>\n<div class=\"actions\"><button id=\"saveTripBtn\" class=\"btn\" type=\"button\">SAVE ACTUAL SAVINGS</button><button id=\"cancelTripBtn\" class=\"btn outline\" type=\"button\">CANCEL</button></div>\n<div id=\"recordTripFeedback\" class=\"notice hidden\" role=\"status\"></div>\n<p class=\"muted\">Recording clears this shopping bag and updates your yearly and lifetime totals. Coupon codes that you did not redeem are not counted.</p>";
+walletPage.insertBefore(recordCard,$("checkoutPanel"));
+var recordBtn=document.createElement("button");recordBtn.id="recordTripBtn";recordBtn.type="button";recordBtn.className="btn full";
+recordBtn.textContent="✓ COMPLETE PURCHASE & TRACK SAVINGS";
+$("checkoutBtn").parentElement.insertBefore(recordBtn,$("checkoutBtn"));
+function totalsForBag(){return bag.reduce(function(t,item){
+ var q=Math.max(1,Math.min(99,Math.floor(Number(item.qty)||1))),price=cents(item.price)||0;
+ t.before+=price*q;t.discount+=Math.min(price,cents(item.discount)||0)*q;t.qty+=q;
+ t.names.add(checkoutStoreInfo(item.store||"other").name);return t
+},{before:0,discount:0,qty:0,names:new Set()})}
+function errorRecord(message){var el=$("recordTripFeedback");el.className="notice error";el.textContent=message}
+$("recordTripBtn").onclick=function(){
+ if(!bag.length){showPage("wallet");return}
+ var totals=totalsForBag();
+ $("recordBefore").textContent=money(totals.before/100);$("recordEstimate").textContent=money((totals.before-totals.discount)/100);
+ $("actualSubtotal").value="";$("receiptConfirmed").checked=false;$("recordTripFeedback").className="notice hidden";
+ recordCard.classList.remove("hidden");showPage("wallet");recordCard.scrollIntoView({behavior:"smooth",block:"start"});
+};
+$("cancelTripBtn").onclick=function(){recordCard.classList.add("hidden")};
+$("saveTripBtn").onclick=function(){
+ if(!bag.length){errorRecord("No products are in your shopping bag.");return}
+ if(!$("receiptConfirmed").checked){errorRecord("Please confirm you completed the purchase and reviewed the receipt.");return}
+ var raw=$("actualSubtotal").value.trim(),after=raw===""?null:cents(raw),t=totalsForBag();
+ if(after===null){errorRecord("Enter the receipt subtotal excluding tax.");return}
+ if(after>t.before){errorRecord("The actual subtotal exceeds the undiscounted total in the shopping bag. Correct the product prices or receipt amount.");return}
+ var date=purchaseDate(),id=date+"-"+Date.now()+"-"+Math.random().toString(36).slice(2,10);
+ var item=safePurchase({id,date,before:t.before/100,after:after/100,quantity:t.qty,stores:[...t.names].join(", ")});
+ if(!item){errorRecord("Could not validate this checkout.");return}
+ purchases.push(item);purchases=purchases.slice(-5000);storeSave(PURCHASE_KEY,purchases);
+ bag=[];storeSave("ss-cart-v2",bag);renderBag();recordCard.classList.add("hidden");$("checkoutPanel").classList.add("hidden");
+ renderHistory();showPage("savings");feedbackHistory("Purchase saved. You saved "+money(item.saved)+" at checkout. Yearly and lifetime totals updated.",false);
+};
+$("exportHistoryBtn").onclick=function(){
+ try{
+  var blob=new Blob([JSON.stringify({schema:"ScanSave-purchases-v1",exported:new Date().toISOString(),purchases:purchases},null,2)],{type:"application/json"});
+  var href=URL.createObjectURL(blob),link=document.createElement("a");link.href=href;link.download="scansave-savings-"+purchaseDate()+".json";
+  document.body.appendChild(link);link.click();link.remove();setTimeout(function(){URL.revokeObjectURL(href)},5000);
+  feedbackHistory("Backup downloaded. Keep it safe when changing devices.",false);
+ }catch(e){feedbackHistory("Could not create backup on this browser.",true)}
+};
+$("importHistoryFile").onchange=async function(){
+ var file=this.files&&this.files[0];if(!file)return;
+ try{
+  if(file.size>1500000)throw Error("oversize");
+  var data=JSON.parse(await file.text());
+  if(data.schema!=="ScanSave-purchases-v1"||!Array.isArray(data.purchases))throw Error("format");
+  var seen=new Set(purchases.map(function(p){return p.id})),added=0;
+  data.purchases.slice(0,5000).map(safePurchase).filter(Boolean).forEach(function(p){if(!seen.has(p.id)){purchases.push(p);seen.add(p.id);added++}});
+  purchases=purchases.slice(-5000);storeSave(PURCHASE_KEY,purchases);renderHistory();
+  feedbackHistory(added+" purchase record"+(added===1?"":"s")+" restored; duplicates skipped.",false);
+ }catch(e){feedbackHistory("Could not restore: choose a valid ScanSave savings backup.",true)}finally{this.value=""}
+};
+renderHistory();
+
+document.body.classList.add("app-ready");
+showPage("scan");
+/* default does not request permission without a user gesture; tapping Scan does */
 
 })();
 </script>
