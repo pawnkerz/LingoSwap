@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#091c2b">
+<meta name="description" content="Scan products, discover legitimate ways to save, and calculate your checkout cost. Free, no sign-in.">
+<title>ScanSave — Scan it. Save more.</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#12283d;background:#f3f7f6}
+*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer}a{color:inherit}
+.top{background:#091e2e;color:white}.top-inner{max-width:1024px;padding:20px 24px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:10px;font-weight:850;letter-spacing:-.04em;font-size:24px}.brand-icon{width:37px;height:37px;display:grid;place-items:center;border-radius:12px;background:#2ee0a3;color:#08243a;font-size:23px}.beta{border:1px solid #4b6874;border-radius:30px;font-size:12px;padding:6px 10px;color:#b9d4da;letter-spacing:.03em}.hero{background:linear-gradient(165deg,#092235,#12384a);color:white;padding:48px 20px 76px;text-align:center}.hero h1{font-size:clamp(32px,6vw,54px);line-height:1.07;letter-spacing:-.048em;margin:0 auto 12px;max-width:710px}.hero h1 span{color:#36e6ad}.hero p{font-size:16px;line-height:1.55;color:#c8dce1;max-width:560px;margin:0 auto}.shell{max-width:1024px;margin:-47px auto 60px;padding:0 20px}.card{background:white;border:1px solid #dfebe7;border-radius:22px;box-shadow:0 10px 30px #07263a0b;padding:24px;margin-bottom:18px}.lead{display:flex;gap:12px;align-items:center;margin-bottom:17px}.step{background:#dcfaf0;color:#066c52;font-size:12px;font-weight:800;padding:7px 10px;border-radius:50px;white-space:nowrap}.lead h2{font-size:21px;margin:0;letter-spacing:-.028em}.label{display:block;font-weight:700;font-size:13px;margin-bottom:8px}.muted{color:#627787;font-size:13px;line-height:1.5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin-bottom:16px}.input{height:49px;width:100%;border:1px solid #ccd9df;border-radius:12px;padding:0 14px;outline:none;background:white;color:#153043}.input:focus{border-color:#18a77f;box-shadow:0 0 0 3px #18a77f18}.mode{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:17px}.mode button{border:1px solid #d6e3e5;border-radius:13px;padding:13px;background:#fff;font-weight:750;color:#506a79}.mode button.active{background:#e8fff5;color:#006b4b;border-color:#5ed8b1}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:0;border-radius:12px;background:#12b889;color:#fff;font-weight:790;padding:14px 18px;min-height:49px}.btn:hover{background:#0b9d73}.btn.secondary{background:#eaf1f3;color:#19384a}.btn.secondary:hover{background:#deeaee}.btn.outline{border:1px solid #bcd4d0;color:#12795d;background:white}.btn.small{font-size:13px;min-height:0;padding:10px 12px}.notice{margin-top:12px;padding:12px 14px;border-radius:11px;background:#f2f7fa;color:#496b7a;font-size:13px;line-height:1.5}.notice.error{background:#fff1f0;color:#a0362e}.notice.good{background:#e9fff5;color:#117457}.hidden{display:none!important}.product{display:flex;gap:16px;align-items:center;padding:16px;border:1px solid #e0eae8;border-radius:14px;background:#fbfefd;margin-bottom:17px}.product img{width:78px;height:78px;object-fit:contain;border-radius:10px;background:white}.product h3{margin:0 0 5px;font-size:18px}.product p{margin:0;font-size:13px;color:#67808d}.product .fallback{width:78px;height:78px;display:grid;place-items:center;background:#ecf7f3;color:#168467;border-radius:10px;font-size:28px}.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}.chip{padding:7px 11px;border-radius:40px;background:#edf6f4;color:#286d5f;font-size:12px;font-weight:700}.offers{display:grid;grid-template-columns:1fr 1fr;gap:12px}.offer{border:1px solid #dae6e7;border-radius:15px;padding:16px;display:flex;flex-direction:column;align-items:flex-start;gap:8px}.offer strong{font-size:15px}.offer p{font-size:12px;color:#6b808a;line-height:1.45;margin:0;flex:1}.offer a{font-size:13px;color:#007b5d;font-weight:800;text-decoration:none}.offer a:hover{text-decoration:underline}.tag{font-size:11px;background:#fff6dd;color:#84631a;border-radius:5px;padding:4px 6px;font-weight:750}.number{color:#0a8969;font-weight:850;font-size:25px}.calc-result{border-radius:15px;background:#092637;color:white;padding:22px;display:grid;grid-template-columns:1fr 1fr;gap:14px}.calc-result .muted{color:#bbd1d9}.calc-result .number{font-size:28px;color:#44e6b3}.calc-result .note{grid-column:1/-1;color:#c7d9e0;font-size:12px;line-height:1.45}.stores{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.store{padding:14px;border:1px solid #dce8e6;border-radius:13px;display:flex;gap:9px;align-items:center;justify-content:space-between}.store label{font-size:14px;font-weight:750}.store a{font-size:12px;color:#008564;text-decoration:none;font-weight:750}.store button{font-size:12px;border:0;background:#eaf7f3;border-radius:7px;padding:6px 9px;color:#227a61}.store button.saved{color:white;background:#16876a}.recent{display:flex;flex-wrap:wrap;gap:9px}.recent button{border:1px solid #d9e8e3;background:#f8fcfa;padding:10px;border-radius:10px;font-size:13px;color:#28576b;text-align:left}.foot{font-size:12px;text-align:center;color:#6d808a;line-height:1.6;padding:10px 16px 40px}.foot a{color:#0b8267}
+.overlay{position:fixed;inset:0;z-index:100;background:#061521ed;display:grid;place-items:center;padding:16px}.scanner{width:min(100%,490px);color:white}.scanner-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.scanner video{width:100%;height:360px;background:#050d14;object-fit:cover;border:2px solid #41d7ac;border-radius:18px}.scanner p{color:#d1e7e8;text-align:center;font-size:14px;line-height:1.5}.scanner button{background:#fff;color:#123148;border:0;border-radius:10px;padding:10px 14px;font-weight:800}
+@media(max-width:660px){.top-inner{padding:13px 17px}.hero{padding:40px 18px 72px}.shell{padding:0 12px}.card{padding:18px;border-radius:19px}.grid,.offers,.stores{grid-template-columns:1fr}.mode button{padding:12px 7px}.product{align-items:flex-start}.lead h2{font-size:19px}.calc-result .number{font-size:25px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-inner"><div class="brand"><div class="brand-icon">⌗</div> ScanSave</div><span class="beta">FREE • NO ACCOUNT NEEDED</span></div></header>
+<section class="hero"><h1>Scan it. <span>Find savings.</span><br>Keep more money.</h1><p>One place to identify products, check real retailer offers, explore coupons and rebates, and estimate your total before checkout.</p></section>
+<main class="shell">
+<section class="card">
+  <div class="lead"><span class="step">STEP 01</span><h2>Scan a product</h2></div>
+  <div class="mode"><button class="active" id="barcodeMode" type="button">▥ &nbsp; Product barcode</button><button id="qrMode" type="button">▦ &nbsp; QR code</button></div>
+  <div class="grid"><div class="field"><label class="label" for="retailer">Where are you shopping?</label><select id="retailer" class="input"><option value="target">Target</option><option value="walmart">Walmart</option><option value="costco">Costco</option><option value="walgreens">Walgreens</option><option value="cvs">CVS</option><option value="kroger">Kroger</option><option value="safeway">Safeway</option><option value="other">Other store</option></select></div><div class="field"><label class="label" for="code">Product code / QR contents</label><input id="code" class="input" inputmode="text" placeholder="e.g. 3017620422003" autocomplete="off"></div></div>
+  <div class="actions"><button id="cameraBtn" class="btn" type="button">▣ &nbsp; Open camera scanner</button><button id="lookupBtn" class="btn secondary" type="button">Look up product</button><button id="exampleBtn" class="btn outline" type="button">Try sample code</button></div>
+  <div id="scanStatus" class="notice" role="status" aria-live="polite">Choose a store, then scan or type a product barcode. For QR codes, identification depends on what the code contains.</div>
+</section>
+<section id="resultSection" class="card hidden">
+  <div class="lead"><span class="step">STEP 02</span><h2>Check every savings route</h2></div>
+  <div id="product" class="product"></div>
+  <div class="field"><label class="label" for="productName">Product name (edit if needed)</label><input id="productName" class="input" placeholder="Enter product name"></div>
+  <div class="chips"><span class="chip" id="storeChip">Store</span><span class="chip">Live searches</span><span class="chip">No fabricated coupons</span></div>
+  <div class="offers" id="offerList"></div>
+  <p class="muted">Offer links open live searches or official retailer pages. This version does not verify whether a coupon applies to your basket or automatically activate rewards.</p>
+</section>
+<section class="card">
+  <div class="lead"><span class="step">STEP 03</span><h2>What will you actually save?</h2></div>
+  <p class="muted">Enter amounts from offers you personally verified. Checkout discounts and rewards earned for later are kept separate.</p>
+  <div class="grid">
+    <div class="field"><label class="label" for="shelfPrice">Shelf price ($)</label><input type="number" min="0" step=".01" inputmode="decimal" class="input" id="shelfPrice" placeholder="24.99"></div>
+    <div class="field"><label class="label" for="instantDiscount">Confirmed checkout discounts ($)</label><input type="number" min="0" step=".01" inputmode="decimal" class="input" id="instantDiscount" placeholder="0.00"></div>
+    <div class="field"><label class="label" for="futureReward">Rewards earned for later ($)</label><input type="number" min="0" step=".01" inputmode="decimal" class="input" id="futureReward" placeholder="0.00"></div>
+    <div class="field"><label class="label" for="taxAmount">Estimated tax ($), optional</label><input type="number" min="0" step=".01" inputmode="decimal" class="input" id="taxAmount" placeholder="0.00"></div>
+  </div>
+  <div class="calc-result">
+    <div><div class="muted">Estimated pay at checkout</div><div class="number" id="checkoutValue">$0.00</div></div>
+    <div><div class="muted">Effective cost after future rewards</div><div class="number" id="effectiveValue">$0.00</div></div>
+    <div class="note" id="calcNote">Enter a shelf price to begin. Rewards for future purchases do not reduce today's checkout charge.</div>
+  </div>
+</section>
+<section class="card">
+  <div class="lead"><span class="step">OPTIONAL</span><h2>Your favorite retailer accounts</h2></div>
+  <p class="muted">Open your retailer's official website or app to activate offers and track rewards. Save favorites here for convenience. <strong>These are not account connections:</strong> balances and reward histories do not sync yet.</p>
+  <div class="stores" id="storeList"></div>
+</section>
+<section class="card">
+  <div class="lead"><span class="step">ON THIS DEVICE</span><h2>Recent product lookups</h2></div>
+  <div id="recent" class="recent"><span class="muted">No scans yet.</span></div>
+  <p class="muted">Recent barcodes and favorite stores are stored locally in this browser. No ScanSave user account is created. Clearing browser storage removes them.</p>
+</section>
+</main>
+<div id="scannerOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Camera scanner">
+ <div class="scanner"><div class="scanner-head"><h2 id="scannerTitle">Point camera at barcode</h2><button id="closeScanner" type="button">Close ✕</button></div><video id="video" playsinline autoplay muted></video><p id="scannerHelp">Position the full code in view. Camera permissions and HTTPS are required.</p></div>
+</div>
+<footer class="foot">ScanSave beta • Prices and eligibility must be confirmed with the retailer • Not affiliated with Target, Walmart, Costco, or any retailer.<br>Product identification uses <a href="https://world.openfoodfacts.org/" target="_blank" rel="noopener noreferrer">Open Food Facts</a> where available. No retailer passwords are collected.</footer>
+<script>
+(function(){
+"use strict";
+var stores=[
+{id:"target",name:"Target",home:"https://www.target.com/circle",search:"https://www.target.com/s?searchTerm="},
+{id:"walmart",name:"Walmart",home:"https://www.walmart.com/",search:"https://www.walmart.com/search?q="},
+{id:"costco",name:"Costco",home:"https://www.costco.com/",search:"https://www.costco.com/CatalogSearch?keyword="},
+{id:"walgreens",name:"Walgreens",home:"https://www.walgreens.com/",search:"https://www.walgreens.com/search/results.jsp?Ntt="},
+{id:"cvs",name:"CVS",home:"https://www.cvs.com/",search:"https://www.cvs.com/search?searchTerm="},
+{id:"kroger",name:"Kroger",home:"https://www.kroger.com/savings/cl/coupons/",search:"https://www.kroger.com/search?query="},
+{id:"safeway",name:"Safeway",home:"https://www.safeway.com/",search:"https://www.safeway.com/shop/search-results.html?q="},
+{id:"other",name:"Other store",home:"https://www.google.com/shopping",search:"https://www.google.com/search?tbm=shop&q="}
+];
+var mode="barcode", productCode="", foundName="", scanControls=null, scanStream=null, frame=0, scanning=false, scanBusy=false, codeReader=null, renderToken=0;
+var $=function(id){return document.getElementById(id)};
+var getStore=function(){return stores.find(function(s){return s.id===$("retailer").value})||stores[0]};
+function storeState(key,initial){try{return JSON.parse(localStorage.getItem(key))||initial}catch(e){return initial}}
+function storeSave(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch(e){}}
+var recent=storeState("ss-recent",[]), favorites=storeState("ss-favorites",[]);
+function msg(text,type){$("scanStatus").textContent=text;$("scanStatus").className="notice"+(type?" "+type:"")}
+function money(value){return Number(value||0).toLocaleString("en-US",{style:"currency",currency:"USD"})}
+function num(id){var value=parseFloat($(id).value);return Number.isFinite(value)?Math.max(0,value):0}
+function calculation(){
+ var shelf=num("shelfPrice"),discount=num("instantDiscount"),future=num("futureReward"),tax=num("taxAmount");
+ var pay=Math.max(0,shelf-discount)+tax, effective=Math.max(0,pay-future);
+ $("checkoutValue").textContent=money(pay);
+ $("effectiveValue").textContent=money(effective);
+ $("calcNote").textContent=shelf===0?"Enter a shelf price to begin.":"Scenario only. Immediate savings: "+money(Math.min(shelf,discount))+". Future rewards: "+money(future)+". Verify eligibility, taxes and stacking rules before paying.";
+}
+["shelfPrice","instantDiscount","futureReward","taxAmount"].forEach(function(id){$(id).addEventListener("input",calculation)});calculation();
+function changeMode(next){
+ mode=next;$("barcodeMode").classList.toggle("active",next==="barcode");$("qrMode").classList.toggle("active",next==="qr");
+ $("code").placeholder=next==="qr"?"Paste a QR link or text":"e.g. 3017620422003";
+ $("code").inputMode=next==="qr"?"text":"numeric";
+ msg(next==="qr"?"QR codes can contain URLs or unrelated data, not necessarily a product barcode.":"Scan or enter a UPC/EAN product barcode.");
+}
+$("barcodeMode").onclick=function(){changeMode("barcode")};$("qrMode").onclick=function(){changeMode("qr")};
+function safeText(text){return String(text==null?"":text).slice(0,300)}
+function showProduct(name,brand,image,code){
+ var target=$("product");target.replaceChildren();
+ var illustration=document.createElement(image?"img":"div");
+ if(image){illustration.src=image;illustration.alt="Product image";illustration.referrerPolicy="no-referrer";illustration.onerror=function(){this.style.display="none"}}else{illustration.className="fallback";illustration.textContent="▣"}
+ target.appendChild(illustration);
+ var info=document.createElement("div"),h=document.createElement("h3"),p=document.createElement("p");
+ h.textContent=name||"Product not identified";p.textContent=(brand?brand+" • ":"")+(code?"Code "+code:"No product code");info.appendChild(h);info.appendChild(p);target.appendChild(info);
+}
+function createOffer(title,description,url,label){
+ var article=document.createElement("div");article.className="offer";
+ var tag=document.createElement("span");tag.className="tag";tag.textContent="CHECK ELIGIBILITY";
+ var strong=document.createElement("strong");strong.textContent=title;
+ var paragraph=document.createElement("p");paragraph.textContent=description;
+ var anchor=document.createElement("a");anchor.textContent=label+" ↗";anchor.href=url;anchor.target="_blank";anchor.rel="noopener noreferrer";
+ article.appendChild(tag);article.appendChild(strong);article.appendChild(paragraph);article.appendChild(anchor);return article;
+}
+function offers(){
+ var store=getStore(), name=$("productName").value.trim()||productCode||"product", query=encodeURIComponent(name);
+ var search=store.search+query;
+ var retailerQuery=encodeURIComponent(name+" "+store.name+" digital coupon discount");
+ var manufacturerQuery=encodeURIComponent(name+" manufacturer printable digital coupon");
+ var rebateQuery=encodeURIComponent(name+" Ibotta Fetch rebate cashback");
+ var compareQuery=encodeURIComponent(name);
+ $("storeChip").textContent="Shopping at "+store.name;
+ var items=[
+ createOffer("Store offers at "+store.name,"Search the retailer's current product listings and promotions. Some offers need your retailer account.",search,"Open official search"),
+ createOffer("Digital coupons & offers","Search for a product-specific discount; verify current validity and retailer restrictions.","https://www.google.com/search?q="+retailerQuery,"Search coupons"),
+ createOffer("Manufacturer coupons","Look for manufacturer-issued coupons eligible at checkout. Only confirmed coupons belong in your estimate.","https://www.google.com/search?q="+manufacturerQuery,"Search manufacturer offers"),
+ createOffer("Rebates and cashback","Search for eligible rebates. These often credit after purchase, not at checkout.","https://www.google.com/search?q="+rebateQuery,"Explore rebates"),
+ createOffer("Compare shopping prices","Check whether another retailer lists the exact same size, item and variation for less.","https://www.google.com/search?tbm=shop&q="+compareQuery,"Compare prices"),
+ createOffer("Your retailer rewards","Use your official retailer account to inspect personalized bonuses, reward balances and activation requirements.",store.home,"Open "+store.name)
+ ];
+ $("offerList").replaceChildren.apply($("offerList"),items);
+}
+$("productName").oninput=function(){offers()};
+$("retailer").onchange=function(){if(!$("resultSection").classList.contains("hidden"))offers()};
+function addRecent(code,name){
+ if(!code)return;
+ recent=recent.filter(function(r){return r.code!==code});
+ recent.unshift({code:code,name:name||code,store:getStore().id});
+ recent=recent.slice(0,12);storeSave("ss-recent",recent);drawRecent();
+}
+function drawRecent(){
+ var area=$("recent");area.replaceChildren();
+ if(!recent.length){var empty=document.createElement("span");empty.className="muted";empty.textContent="No scans yet.";area.appendChild(empty);return}
+ recent.forEach(function(r){var b=document.createElement("button");b.type="button";b.textContent=(r.name||r.code).slice(0,38);b.title=r.code;b.onclick=function(){$("retailer").value=r.store||"target";$("code").value=r.code;lookup();window.scrollTo({top:0,behavior:"smooth"})};area.appendChild(b)});
+}
+function drawStores(){
+ var area=$("storeList");area.replaceChildren();
+ stores.filter(function(s){return s.id!=="other"}).forEach(function(s){
+ var line=document.createElement("div");line.className="store";
+ var left=document.createElement("div"),name=document.createElement("label"),link=document.createElement("a");
+ name.textContent=s.name;link.textContent="Official account ↗";link.href=s.home;link.target="_blank";link.rel="noopener noreferrer";left.appendChild(name);left.appendChild(document.createElement("br"));left.appendChild(link);
+ var button=document.createElement("button");button.type="button";var selected=favorites.includes(s.id);button.textContent=selected?"★ Saved":"☆ Save";button.className=selected?"saved":"";
+ button.onclick=function(){favorites=favorites.includes(s.id)?favorites.filter(function(i){return i!==s.id}):favorites.concat(s.id);storeSave("ss-favorites",favorites);drawStores()};
+ line.appendChild(left);line.appendChild(button);area.appendChild(line);
+ });
+}
+drawRecent();drawStores();
+function interpretQR(raw){
+ var text=raw.trim();
+ if(/^\d{8,14}$/.test(text))return text;
+ try{var url=new URL(text);for(var key of ["gtin","upc","ean","barcode","product_code"]){var value=url.searchParams.get(key);if(value&&/^\d{8,14}$/.test(value))return value}}catch(e){}
+ return "";
+}
+async function lookup(){
+ var raw=$("code").value.trim();if(!raw){msg("Enter or scan a barcode first.","error");return}
+ var code=/^\d{8,14}$/.test(raw)?raw:interpretQR(raw);
+ if(!code){
+  if(mode==="qr"){msg("QR code read, but it does not contain a recognizable product barcode. Enter a product UPC/EAN manually; the QR contents were not opened for safety.","error")}
+  else{msg("This does not look like an 8–14 digit UPC/EAN product barcode.","error")}
+  return;
+ }
+ productCode=code;var token=++renderToken;$("resultSection").classList.remove("hidden");$("productName").value="";foundName="";
+ showProduct("Looking up product…","",null,code);msg("Looking up barcode in the public product database…");
+ try{
+  var endpoint="https://world.openfoodfacts.org/api/v3.6/product/"+encodeURIComponent(code)+".json?fields=code,product_name,brands,image_front_small_url,quantity";
+  var response=await fetch(endpoint,{headers:{"Accept":"application/json"}});
+  if(!response.ok)throw new Error("Lookup service returned "+response.status);
+  var data=await response.json();if(token!==renderToken)return;
+  var product=data.product||null;
+  foundName=product?(product.product_name||""):"";
+  $("productName").value=foundName;
+  showProduct(foundName||"Product not found in food database",product?(product.brands||""):"",product?(product.image_front_small_url||""):null,code);
+  msg(foundName?"Product identified. Check live offers below.":"Barcode recognized, but this item was not found in the food database. Enter its name to search.","good");
+  addRecent(code,foundName||code);
+ }catch(error){
+  if(token!==renderToken)return;
+  showProduct("Barcode ready — name needed","",null,code);
+  msg("The product lookup could not be completed. You can enter the product name and still explore retailer offers.","error");
+  addRecent(code,code);
+ }
+ offers();$("resultSection").scrollIntoView({behavior:"smooth",block:"start"});
+}
+$("lookupBtn").onclick=lookup;
+$("code").addEventListener("keydown",function(e){if(e.key==="Enter")lookup()});
+$("exampleBtn").onclick=function(){changeMode("barcode");$("code").value="3017620422003";lookup()};
+async function loadZXing(){
+ if(window.ZXingBrowser)return window.ZXingBrowser;
+ await new Promise(function(resolve,reject){
+  var s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.5/umd/zxing-browser.min.js";
+  s.onload=resolve;s.onerror=function(){reject(new Error("Scanner library unavailable"))};document.head.appendChild(s);
+ });
+ if(!window.ZXingBrowser)throw new Error("Scanner library unavailable");
+ return window.ZXingBrowser;
+}
+function stopScanner(){
+ scanning=false;scanBusy=false;if(frame){cancelAnimationFrame(frame);frame=0}
+ if(scanControls){try{scanControls.stop()}catch(e){} scanControls=null}
+ if(scanStream){scanStream.getTracks().forEach(function(track){track.stop()});scanStream=null}
+ var video=$("video");try{video.pause()}catch(e){}video.srcObject=null;
+ $("scannerOverlay").classList.add("hidden");
+}
+async function startScanner(){
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg("Camera scanning requires HTTPS and browser camera permission. Please enter the barcode manually.","error");return}
+ $("scannerTitle").textContent=mode==="qr"?"Scan QR code":"Scan product barcode";
+ $("scannerOverlay").classList.remove("hidden");$("scannerHelp").textContent="Allow camera access. Position the code inside the camera view.";
+ scanning=true;var video=$("video");
+ try{
+  if("BarcodeDetector" in window){
+   var formats=mode==="qr"?["qr_code"]:["ean_13","ean_8","upc_a","upc_e","code_128"];
+   var supported=await window.BarcodeDetector.getSupportedFormats();
+   var chosen=formats.filter(function(f){return supported.includes(f)});
+   if(chosen.length){
+    var detector=new BarcodeDetector({formats:chosen});
+    scanStream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:"environment"}}});
+    video.srcObject=scanStream;await video.play();
+    var tick=async function(){
+     if(!scanning)return;
+     if(!scanBusy&&video.readyState>=2){
+      scanBusy=true;try{var results=await detector.detect(video);
+       if(results.length){var value=results[0].rawValue;stopScanner();$("code").value=value;await lookup();return}
+      }catch(e){}finally{scanBusy=false}
+     }
+     if(scanning)frame=requestAnimationFrame(tick);
+    };frame=requestAnimationFrame(tick);return;
+   }
+  }
+  var lib=await loadZXing();if(!scanning)return;
+  codeReader=mode==="qr"?new lib.BrowserQRCodeReader():new lib.BrowserMultiFormatReader();
+  scanControls=await codeReader.decodeFromConstraints({audio:false,video:{facingMode:"environment"}},video,function(result){
+   if(result&&scanning){var value=result.getText();stopScanner();$("code").value=value;lookup()}
+  });
+ }catch(error){stopScanner();msg("Camera scan unavailable ("+safeText(error.message)+"). Try manual entry.","error")}
+}
+$("cameraBtn").onclick=startScanner;$("closeScanner").onclick=stopScanner;
+document.addEventListener("keydown",function(e){if(e.key==="Escape")stopScanner()});
+})();
+</script>
+</body>
+</html>
